@@ -55,3 +55,17 @@ class PrintReceiptEvent extends BillingEvent {
   @override
   List<Object> get props => [shopName, address1, address2, phone, footer];
 }
+
+// ✅ جدید: ارسال فاکتور با پیامک
+class SendSmsReceiptEvent extends BillingEvent {
+  final String customerPhone;
+  final String shopName;
+
+  const SendSmsReceiptEvent({
+    required this.customerPhone,
+    required this.shopName,
+  });
+
+  @override
+  List<Object> get props => [customerPhone, shopName];
+}
