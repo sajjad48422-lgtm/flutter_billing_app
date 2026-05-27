@@ -5,6 +5,7 @@ import 'package:billing_app/features/product/domain/entities/product.dart';
 import 'package:billing_app/features/product/domain/usecases/product_usecases.dart';
 import '../../../../core/utils/printer_helper.dart';
 import '../../../../core/data/hive_database.dart';
+import '../../../../core/services/sms_service.dart';
 
 part 'billing_event.dart';
 part 'billing_state.dart';
@@ -20,33 +21,30 @@ class BillingBloc extends Bloc<BillingEvent, BillingState> {
     on<UpdateQuantityEvent>(_onUpdateQuantity);
     on<ClearCartEvent>(_onClearCart);
     on<PrintReceiptEvent>(_onPrintReceipt);
+    on<SendSmsReceiptEvent>(_onSendSmsReceipt);
   }
 
   Future<void> _onScanBarcode(
       ScanBarcodeEvent event, Emitter<BillingState> emit) async {
     final result = await getProductByBarcodeUseCase(event.barcode);
     result.fold(
-      (failure) =>
-          emit(state.copyWith(error: 'Product not found: ${event.barcode}')),
-      (product) {
-        add(AddProductToCartEvent(product));
-      },
+      (failure) => emit(state.copyWith(
+          error: 'محصول یافت نشد: ${event.barcode}')),
+      (product) => add(AddProductToCartEvent(product)),
     );
   }
 
   void _onAddProductToCart(
       AddProductToCartEvent event, Emitter<BillingState> emit) {
-    // Clear error when adding
     final cleanState = state.copyWith(error: null);
-
     final existingIndex = cleanState.cartItems
         .indexWhere((item) => item.product.id == event.product.id);
     if (existingIndex >= 0) {
       final existingItem = cleanState.cartItems[existingIndex];
-      final backendItems = List<CartItem>.from(cleanState.cartItems);
-      backendItems[existingIndex] =
+      final updatedItems = List<CartItem>.from(cleanState.cartItems);
+      updatedItems[existingIndex] =
           existingItem.copyWith(quantity: existingItem.quantity + 1);
-      emit(cleanState.copyWith(cartItems: backendItems, error: null));
+      emit(cleanState.copyWith(cartItems: updatedItems, error: null));
     } else {
       final newItem = CartItem(product: event.product);
       emit(cleanState.copyWith(
@@ -68,7 +66,6 @@ class BillingBloc extends Bloc<BillingEvent, BillingState> {
       add(RemoveProductFromCartEvent(event.productId));
       return;
     }
-
     final index = state.cartItems
         .indexWhere((item) => item.product.id == event.productId);
     if (index >= 0) {
@@ -92,13 +89,14 @@ class BillingBloc extends Bloc<BillingEvent, BillingState> {
         final connected = await printerHelper.connect(savedMac);
         if (!connected) {
           emit(state.copyWith(
-              error: 'Failed to auto-connect to printer!', clearError: false));
+              error: 'اتصال به پرینتر ناموفق بود!',
+              clearError: false));
           emit(state.copyWith(clearError: true));
           return;
         }
       } else {
         emit(state.copyWith(
-            error: 'Printer not connected & no saved printer found!',
+            error: 'پرینتر متصل نیست!',
             clearError: false));
         emit(state.copyWith(clearError: true));
         return;
@@ -130,9 +128,53 @@ class BillingBloc extends Bloc<BillingEvent, BillingState> {
       emit(state.copyWith(isPrinting: false, printSuccess: true));
     } catch (e) {
       emit(state.copyWith(
-          isPrinting: false, error: 'Print failed: $e', clearError: false));
-      // Reset error instantly avoids sticky error
+          isPrinting: false,
+          error: 'خطا در چاپ: $e',
+          clearError: false));
       emit(state.copyWith(clearError: true));
+    }
+  }
+
+  Future<void> _onSendSmsReceipt(
+      SendSmsReceiptEvent event, Emitter<BillingState> emit) async {
+    emit(state.copyWith(isSendingSms: true, smsSuccess: false));
+
+    final items = state.cartItems
+        .map((item) => InvoiceItem(
+              name: item.product.name,
+              quantity: item.quantity,
+              total: item.total,
+            ))
+        .toList();
+
+    final result = await SmsService.sendInvoiceViaSim(
+      customerPhone: event.customerPhone,
+      shopName: event.shopName,
+      items: items,
+      subtotal: state.subtotal,
+      vatAmount: state.vatAmount,
+      total: state.totalAmount,
+      invoiceNumber: DateTime.now().millisecondsSinceEpoch.toString(),
+    );
+
+    switch (result) {
+      case SmsResult.success:
+        emit(state.copyWith(isSendingSms: false, smsSuccess: true));
+        break;
+      case SmsResult.permissionDenied:
+        emit(state.copyWith(
+            isSendingSms: false,
+            error: 'دسترسی به پیامک داده نشد!',
+            clearError: false));
+        emit(state.copyWith(clearError: true));
+        break;
+      case SmsResult.failed:
+        emit(state.copyWith(
+            isSendingSms: false,
+            error: 'ارسال پیامک ناموفق بود!',
+            clearError: false));
+        emit(state.copyWith(clearError: true));
+        break;
     }
   }
 }
