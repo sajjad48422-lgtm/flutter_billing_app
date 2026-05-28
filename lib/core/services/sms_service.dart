@@ -33,7 +33,6 @@ class SmsService {
       await _telephony.sendSms(
         to: customerPhone,
         message: message,
-        statusListener: (SendStatus status) {},
       );
       return SmsResult.success;
     } catch (e) {
@@ -50,24 +49,21 @@ class SmsService {
     required String invoiceNumber,
   }) {
     final buffer = StringBuffer();
-    buffer.writeln('🧾 فاکتور $shopName');
+    buffer.writeln('فاکتور $shopName');
     buffer.writeln('شماره: $invoiceNumber');
     buffer.writeln('تاریخ: ${ShamsiHelper.today}');
     buffer.writeln('─────────────────');
     for (final item in items) {
       buffer.writeln(
-        '${item.name} × ${item.quantity} = '
+        '${item.name} x${item.quantity} = '
         '${CurrencyFormatter.format(item.total)}',
       );
     }
     buffer.writeln('─────────────────');
-    buffer.writeln(
-        'جمع: ${CurrencyFormatter.format(subtotal)}');
-    buffer.writeln(
-        'مالیات ۹٪: ${CurrencyFormatter.format(vatAmount)}');
-    buffer.writeln(
-        'مبلغ کل: ${CurrencyFormatter.format(total)}');
-    buffer.writeln('با تشکر از خرید شما 🙏');
+    buffer.writeln('جمع: ${CurrencyFormatter.format(subtotal)}');
+    buffer.writeln('مالیات ۹٪: ${CurrencyFormatter.format(vatAmount)}');
+    buffer.writeln('مبلغ کل: ${CurrencyFormatter.format(total)}');
+    buffer.writeln('با تشکر از خرید شما');
     return buffer.toString();
   }
 }
