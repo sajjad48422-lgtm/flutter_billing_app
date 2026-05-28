@@ -1,5 +1,5 @@
-import 'package:billing_app/core/widgets/input_label.dart';
-import 'package:billing_app/core/widgets/primary_button.dart';
+import 'package:depir/core/widgets/input_label.dart';
+import 'package:depir/core/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -21,12 +21,16 @@ class _EditProductPageState extends State<EditProductPage> {
   final _formKey = GlobalKey<FormState>();
   late String _name;
   late double _price;
+  late int _stock;
+  late int _lowStockThreshold;
 
   @override
   void initState() {
     super.initState();
     _name = widget.product.name;
     _price = widget.product.price;
+    _stock = widget.product.stock;
+    _lowStockThreshold = widget.product.lowStockThreshold;
   }
 
   void _submit() {
@@ -38,6 +42,8 @@ class _EditProductPageState extends State<EditProductPage> {
         name: _name,
         barcode: widget.product.barcode,
         price: _price,
+        stock: _stock,
+        lowStockThreshold: _lowStockThreshold,
       );
 
       context.read<ProductBloc>().add(UpdateProduct(updatedProduct));
@@ -47,27 +53,30 @@ class _EditProductPageState extends State<EditProductPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
         appBar: AppBar(
           elevation: 0,
           leading: IconButton(
-            icon: Icon(Icons.chevron_left,
+            icon: Icon(Icons.chevron_right,
                 size: 32, color: Theme.of(context).primaryColor),
             onPressed: () => context.pop(),
           ),
-          title: const Text('Edit Product',
+          title: const Text('ویرایش کالا',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
           centerTitle: true,
         ),
         body: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
             child: Form(
               key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Display Barcode details (immutable block)
+                  // بارکد (غیرقابل ویرایش)
                   Container(
                     padding: const EdgeInsets.all(16),
                     margin: const EdgeInsets.only(bottom: 24),
@@ -75,7 +84,8 @@ class _EditProductPageState extends State<EditProductPage> {
                       color: AppTheme.primaryColor.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                          color: AppTheme.primaryColor.withValues(alpha: 0.1)),
+                          color: AppTheme.primaryColor
+                              .withValues(alpha: 0.1)),
                     ),
                     child: Row(
                       children: [
@@ -85,7 +95,7 @@ class _EditProductPageState extends State<EditProductPage> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('BARCODE',
+                            Text('بارکد',
                                 style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
@@ -103,31 +113,63 @@ class _EditProductPageState extends State<EditProductPage> {
                     ),
                   ),
 
-                  const InputLabel(text: 'Product Name'),
-
+                  const InputLabel(text: 'نام کالا'),
                   TextFormField(
                     initialValue: _name,
-                    textCapitalization: TextCapitalization.words,
-                    validator: AppValidators.required('Please enter a name'),
+                    validator:
+                        AppValidators.required('لطفاً نام کالا را وارد کنید'),
                     onSaved: (value) => _name = value!,
                   ),
                   const SizedBox(height: 24),
 
-                  const InputLabel(text: 'Price'),
-
+                  const InputLabel(text: 'قیمت (تومان)'),
                   TextFormField(
-                    initialValue: _price.toStringAsFixed(2),
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
-                    decoration: const InputDecoration(
-                      prefixText: '₹ ',
-                      prefixStyle: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black),
-                    ),
+                    initialValue: _price.toStringAsFixed(0),
+                    keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true),
+                    textDirection: TextDirection.ltr,
                     validator: AppValidators.price,
                     onSaved: (value) => _price = double.parse(value!),
+                  ),
+                  const SizedBox(height: 24),
+
+                  const InputLabel(text: 'تعداد موجودی'),
+                  TextFormField(
+                    initialValue: _stock.toString(),
+                    keyboardType: TextInputType.number,
+                    textDirection: TextDirection.ltr,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'لطفاً موجودی را وارد کنید';
+                      }
+                      if (int.tryParse(value) == null) {
+                        return 'عدد صحیح وارد کنید';
+                      }
+                      return null;
+                    },
+                    onSaved: (value) => _stock = int.parse(value!),
+                  ),
+                  const SizedBox(height: 24),
+
+                  const InputLabel(text: 'هشدار کمبود موجودی'),
+                  TextFormField(
+                    initialValue: _lowStockThreshold.toString(),
+                    keyboardType: TextInputType.number,
+                    textDirection: TextDirection.ltr,
+                    decoration: const InputDecoration(
+                      helperText:
+                          'وقتی موجودی به این عدد رسید هشدار داده می‌شود',
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) return null;
+                      if (int.tryParse(value) == null) {
+                        return 'عدد صحیح وارد کنید';
+                      }
+                      return null;
+                    },
+                    onSaved: (value) =>
+                        _lowStockThreshold =
+                            int.tryParse(value ?? '2') ?? 2,
                   ),
                 ],
               ),
@@ -137,7 +179,9 @@ class _EditProductPageState extends State<EditProductPage> {
         bottomNavigationBar: PrimaryButton(
           onPressed: _submit,
           icon: Icons.save,
-          label: 'Save Changes',
-        ));
+          label: 'ذخیره تغییرات',
+        ),
+      ),
+    );
   }
 }
