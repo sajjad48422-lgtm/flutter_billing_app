@@ -1,6 +1,6 @@
-import 'package:billing_app/core/utils/currency_formatter.dart';
-import 'package:billing_app/core/utils/tax_calculator.dart';
-import 'package:billing_app/core/widgets/primary_button.dart';
+import 'package:depir/core/utils/currency_formatter.dart';
+import 'package:depir/core/utils/tax_calculator.dart';
+import 'package:depir/core/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
