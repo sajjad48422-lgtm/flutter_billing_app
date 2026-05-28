@@ -1,4 +1,4 @@
-import 'package:telephony/telephony.dart';
+import 'package:another_telephony/telephony.dart';
 import '../utils/currency_formatter.dart';
 import '../utils/shamsi_helper.dart';
 
