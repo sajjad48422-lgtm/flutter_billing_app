@@ -15,7 +15,7 @@
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
 
     <application
-        android:label="سیستم فروشگاهی"
+        android:label="دپیر"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
