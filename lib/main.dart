@@ -40,7 +40,7 @@ class MyApp extends StatelessWidget {
                 di.sl<PrinterBloc>()..add(InitPrinterEvent())),
       ],
       child: MaterialApp.router(
-        title: 'سیستم فروشگاهی',
+        title: 'دپیر',
         locale: const Locale('fa', 'IR'),
         supportedLocales: const [
           Locale('fa', 'IR'),
