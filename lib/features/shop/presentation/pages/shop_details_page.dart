@@ -33,8 +33,6 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
     _phoneController = TextEditingController();
     _upiController = TextEditingController();
     _footerController = TextEditingController();
-
-    // Load shop data
     context.read<ShopBloc>().add(LoadShopEvent());
   }
 
@@ -70,29 +68,45 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
         upiId: _upiController.text,
         footerText: _footerController.text,
       );
-
       context.read<ShopBloc>().add(UpdateShopEvent(shop));
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
         appBar: AppBar(
-          title: const Text('Shop Details'),
+          title: const Text('اطلاعات فروشگاه'),
+          centerTitle: true,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(Icons.chevron_right,
+                size: 28, color: Theme.of(context).primaryColor),
+            onPressed: () => context.pop(),
+          ),
         ),
         body: BlocConsumer<ShopBloc, ShopState>(
           listener: (context, state) {
             if (state is ShopLoaded) {
               _updateControllers(state.shop);
             } else if (state is ShopOperationSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  content: Text('Shop details saved!'),
-                  backgroundColor: Colors.green));
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('اطلاعات با موفقیت ذخیره شد ✓'),
+                  backgroundColor: Colors.green,
+                ),
+              );
               context.pop();
             } else if (state is ShopError) {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text(state.message), backgroundColor: Colors.red));
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Colors.red,
+                ),
+              );
             }
           },
           buildWhen: (previous, current) =>
@@ -109,67 +123,69 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text('General Information',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.2,
-                          color: AppTheme.primaryColor.withValues(alpha: 0.8),
-                        )),
-                    const SizedBox(
-                      height: 5,
-                    ),
                     Text(
-                      'These details will appear on your digital and printed receipts.',
+                      'اطلاعات عمومی',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                        color: AppTheme.primaryColor.withValues(alpha: 0.8),
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      'این اطلاعات روی رسیدهای چاپی و دیجیتال نمایش داده می‌شود.',
                       style: TextStyle(fontSize: 12, color: Colors.grey[500]),
                     ),
                     const SizedBox(height: 24),
-                    const InputLabel(text: 'Shop Name'),
+                    const InputLabel(text: 'نام فروشگاه'),
                     _buildTextField(
                       controller: _nameController,
-                      hint: 'e.g. QuickMart Superstore',
-                      validator: AppValidators.required('Required'),
+                      hint: 'مثلاً: سوپرمارکت سجاد',
+                      validator: AppValidators.required('الزامی'),
                     ),
                     const SizedBox(height: 15),
-                    const InputLabel(text: 'Address Line 1'),
+                    const InputLabel(text: 'آدرس خط ۱'),
                     _buildTextField(
                       controller: _address1Controller,
-                      hint: 'Samrajpet, Mecheri',
-                      validator: AppValidators.required('Required'),
+                      hint: 'خیابان، کوچه',
+                      validator: AppValidators.required('الزامی'),
                     ),
                     const SizedBox(height: 15),
-                    const InputLabel(text: 'Address Line 2 (Optional)'),
+                    const InputLabel(text: 'آدرس خط ۲ (اختیاری)'),
                     _buildTextField(
                       controller: _address2Controller,
-                      hint: 'Salem - 636453',
+                      hint: 'شهر - کد پستی',
                     ),
                     const SizedBox(height: 15),
-                    const InputLabel(text: 'Phone Number'),
+                    const InputLabel(text: 'شماره تلفن'),
                     _buildTextField(
                       controller: _phoneController,
-                      hint: '+91 7010674588',
+                      hint: '09123456789',
                       keyboardType: TextInputType.phone,
-                      validator: AppValidators.required('Required'),
+                      validator: AppValidators.required('الزامی'),
                     ),
                     const SizedBox(height: 15),
-                    const InputLabel(text: 'UPI ID'),
+                    const InputLabel(text: 'شناسه پرداخت (اختیاری)'),
                     _buildTextField(
                       controller: _upiController,
-                      hint: 'dineshsowndar@oksbi',
+                      hint: 'اختیاری',
                     ),
                     const SizedBox(height: 15),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const InputLabel(text: 'Receipt Footer Text'),
-                        Text('Max 150 chars',
-                            style: TextStyle(
-                                fontSize: 11, color: Colors.grey[400])),
+                        const InputLabel(text: 'متن پایین رسید'),
+                        Text(
+                          'حداکثر ۶۰ کاراکتر',
+                          style: TextStyle(
+                              fontSize: 11, color: Colors.grey[400]),
+                        ),
                       ],
                     ),
                     _buildTextField(
                       controller: _footerController,
-                      hint: 'Thank you, Visit again!!!',
+                      hint: 'مثلاً: با تشکر از خرید شما',
                       maxLines: 2,
                       maxLength: 60,
                     ),
@@ -182,8 +198,10 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
         bottomNavigationBar: PrimaryButton(
           onPressed: _saveShop,
           icon: Icons.save,
-          label: 'Save Details',
-        ));
+          label: 'ذخیره اطلاعات',
+        ),
+      ),
+    );
   }
 
   Widget _buildTextField({
@@ -199,7 +217,6 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
       keyboardType: keyboardType,
       maxLines: maxLines,
       maxLength: maxLength,
-      textCapitalization: TextCapitalization.words,
       validator: validator,
       decoration: InputDecoration(
         hintText: hint,
