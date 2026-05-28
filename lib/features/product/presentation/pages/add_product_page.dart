@@ -22,6 +22,8 @@ class _AddProductPageState extends State<AddProductPage> {
   String _name = '';
   String _barcode = '';
   double _price = 0.0;
+  int _stock = 0;
+  int _lowStockThreshold = 2;
 
   void _scanBarcode() async {
     final result = await context.push<String>('/scanner');
@@ -37,13 +39,14 @@ class _AddProductPageState extends State<AddProductPage> {
       _formKey.currentState!.save();
 
       final productState = context.read<ProductBloc>().state;
-      final existingProduct =
-          productState.products.where((p) => p.barcode == _barcode).firstOrNull;
+      final existingProduct = productState.products
+          .where((p) => p.barcode == _barcode)
+          .firstOrNull;
 
       if (existingProduct != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Product with barcode "$_barcode" already exists!'),
+            content: Text('کالا با بارکد "$_barcode" قبلاً ثبت شده!'),
             backgroundColor: Colors.red,
           ),
         );
@@ -55,6 +58,8 @@ class _AddProductPageState extends State<AddProductPage> {
         name: _name,
         barcode: _barcode,
         price: _price,
+        stock: _stock,
+        lowStockThreshold: _lowStockThreshold,
       );
 
       context.read<ProductBloc>().add(AddProduct(product));
@@ -64,46 +69,52 @@ class _AddProductPageState extends State<AddProductPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
           leading: IconButton(
-            icon: Icon(Icons.chevron_left,
+            icon: Icon(Icons.chevron_right,
                 size: 28, color: Theme.of(context).primaryColor),
             onPressed: () => context.pop(),
           ),
-          title: const Text('Add Product',
+          title: const Text('افزودن کالا',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
           centerTitle: true,
         ),
         body: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
             child: Form(
               key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const InputLabel(text: 'Barcode'),
+                  // بارکد
+                  const InputLabel(text: 'بارکد'),
                   Row(
                     children: [
                       Expanded(
                         child: TextFormField(
                           key: ValueKey(_barcode),
                           initialValue: _barcode,
+                          textDirection: TextDirection.ltr,
                           decoration: const InputDecoration(
-                            hintText: 'Scan or enter barcode',
+                            hintText: 'اسکن یا وارد کنید',
                           ),
-                          validator:
-                              AppValidators.required('Please enter a barcode'),
+                          validator: AppValidators.required(
+                              'لطفاً بارکد را وارد کنید'),
                           onSaved: (value) => _barcode = value!,
                         ),
                       ),
                       const SizedBox(width: 12),
                       Container(
                         decoration: BoxDecoration(
-                          color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                          color: AppTheme.primaryColor
+                              .withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: IconButton(
@@ -116,33 +127,80 @@ class _AddProductPageState extends State<AddProductPage> {
                     ],
                   ),
                   const SizedBox(height: 6),
-                  const Text('Tap the icon to open camera scanner',
-                      style: TextStyle(fontSize: 12, color: Color(0xFF4C669A))),
+                  const Text(
+                    'برای اسکن بارکد روی آیکون بزنید',
+                    style: TextStyle(
+                        fontSize: 12, color: Color(0xFF4C669A)),
+                  ),
                   const SizedBox(height: 24),
-                  const InputLabel(text: 'Product Name'),
+
+                  // نام کالا
+                  const InputLabel(text: 'نام کالا'),
                   TextFormField(
                     decoration: const InputDecoration(
-                      hintText: 'e.g. Basmati Rice',
+                      hintText: 'مثلاً: برنج ایرانی',
                     ),
-                    textCapitalization: TextCapitalization.words,
-                    validator: AppValidators.required('Please enter a name'),
+                    validator:
+                        AppValidators.required('لطفاً نام کالا را وارد کنید'),
                     onSaved: (value) => _name = value!,
                   ),
                   const SizedBox(height: 24),
-                  const InputLabel(text: 'Price'),
+
+                  // قیمت
+                  const InputLabel(text: 'قیمت (تومان)'),
                   TextFormField(
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true),
+                    textDirection: TextDirection.ltr,
                     decoration: const InputDecoration(
-                      hintText: '0.00',
-                      prefixText: '₹ ',
-                      prefixStyle: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black),
+                      hintText: '0',
                     ),
                     validator: AppValidators.price,
                     onSaved: (value) => _price = double.parse(value!),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // موجودی
+                  const InputLabel(text: 'تعداد موجودی'),
+                  TextFormField(
+                    keyboardType: TextInputType.number,
+                    textDirection: TextDirection.ltr,
+                    decoration: const InputDecoration(
+                      hintText: '0',
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'لطفاً موجودی را وارد کنید';
+                      }
+                      if (int.tryParse(value) == null) {
+                        return 'عدد صحیح وارد کنید';
+                      }
+                      return null;
+                    },
+                    onSaved: (value) => _stock = int.parse(value!),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // حد هشدار موجودی
+                  const InputLabel(text: 'هشدار کمبود موجودی'),
+                  TextFormField(
+                    keyboardType: TextInputType.number,
+                    textDirection: TextDirection.ltr,
+                    initialValue: '2',
+                    decoration: const InputDecoration(
+                      hintText: '2',
+                      helperText:
+                          'وقتی موجودی به این عدد رسید هشدار داده می‌شود',
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) return null;
+                      if (int.tryParse(value) == null) {
+                        return 'عدد صحیح وارد کنید';
+                      }
+                      return null;
+                    },
+                    onSaved: (value) => _lowStockThreshold =
+                        int.tryParse(value ?? '2') ?? 2,
                   ),
                 ],
               ),
@@ -152,7 +210,9 @@ class _AddProductPageState extends State<AddProductPage> {
         bottomNavigationBar: PrimaryButton(
           onPressed: _submit,
           icon: Icons.add_circle,
-          label: 'Add Product',
-        ));
+          label: 'افزودن کالا',
+        ),
+      ),
+    );
   }
 }
