@@ -340,7 +340,7 @@ class AboutPage extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                '© ۱۴۰۴ دپیر — تمامی حقوق محفوظ است',
+                '© ۱۴۰۵ دپیر — تمامی حقوق محفوظ است',
                 style: TextStyle(
                   fontSize: 11,
                   color: Colors.grey[400],
