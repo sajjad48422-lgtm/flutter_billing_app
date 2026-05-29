@@ -250,7 +250,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           ],
                         ),
                         child: Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+                          padding: EdgeInsets.fromLTRB(16, 12, 16, 
+    MediaQuery.of(context).padding.bottom + 24),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
