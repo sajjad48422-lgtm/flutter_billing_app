@@ -24,6 +24,7 @@ class _AddProductPageState extends State<AddProductPage> {
   double _price = 0.0;
   int _stock = 0;
   int _lowStockThreshold = 2;
+  ProductUnit _unit = ProductUnit.piece;
 
   void _scanBarcode() async {
     final result = await context.push<String>('/scanner');
@@ -32,6 +33,13 @@ class _AddProductPageState extends State<AddProductPage> {
         _barcode = result;
       });
     }
+  }
+
+  void _generateBarcode() {
+    final generated = DateTime.now().millisecondsSinceEpoch.toString();
+    setState(() {
+      _barcode = generated;
+    });
   }
 
   void _submit() {
@@ -60,6 +68,7 @@ class _AddProductPageState extends State<AddProductPage> {
         price: _price,
         stock: _stock,
         lowStockThreshold: _lowStockThreshold,
+        unit: _unit,
       );
 
       context.read<ProductBloc>().add(AddProduct(product));
@@ -110,7 +119,8 @@ class _AddProductPageState extends State<AddProductPage> {
                           onSaved: (value) => _barcode = value!,
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 8),
+                      // دکمه اسکن
                       Container(
                         decoration: BoxDecoration(
                           color: AppTheme.primaryColor
@@ -122,13 +132,29 @@ class _AddProductPageState extends State<AddProductPage> {
                               color: AppTheme.primaryColor),
                           onPressed: _scanBarcode,
                           padding: const EdgeInsets.all(14),
+                          tooltip: 'اسکن بارکد',
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      // دکمه ساخت بارکد
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.green.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: IconButton(
+                          icon: const Icon(Icons.auto_awesome,
+                              color: Colors.green),
+                          onPressed: _generateBarcode,
+                          padding: const EdgeInsets.all(14),
+                          tooltip: 'ساخت بارکد خودکار',
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 6),
                   const Text(
-                    'برای اسکن بارکد روی آیکون بزنید',
+                    'برای کالای بدون بارکد روی ✨ بزنید',
                     style: TextStyle(
                         fontSize: 12, color: Color(0xFF4C669A)),
                   ),
@@ -140,9 +166,38 @@ class _AddProductPageState extends State<AddProductPage> {
                     decoration: const InputDecoration(
                       hintText: 'مثلاً: برنج ایرانی',
                     ),
-                    validator:
-                        AppValidators.required('لطفاً نام کالا را وارد کنید'),
+                    validator: AppValidators.required(
+                        'لطفاً نام کالا را وارد کنید'),
                     onSaved: (value) => _name = value!,
+                  ),
+                  const SizedBox(height: 24),
+
+                  // واحد سنجش
+                  const InputLabel(text: 'واحد سنجش'),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey[300]!),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<ProductUnit>(
+                        value: _unit,
+                        isExpanded: true,
+                        items: ProductUnit.values.map((unit) {
+                          return DropdownMenuItem(
+                            value: unit,
+                            child: Text(unit.label),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          if (value != null) {
+                            setState(() => _unit = value);
+                          }
+                        },
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 24),
 
@@ -199,8 +254,9 @@ class _AddProductPageState extends State<AddProductPage> {
                       }
                       return null;
                     },
-                    onSaved: (value) => _lowStockThreshold =
-                        int.tryParse(value ?? '2') ?? 2,
+                    onSaved: (value) =>
+                        _lowStockThreshold =
+                            int.tryParse(value ?? '2') ?? 2,
                   ),
                 ],
               ),
