@@ -166,10 +166,10 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
                       validator: AppValidators.required('الزامی'),
                     ),
                     const SizedBox(height: 15),
-                    const InputLabel(text: 'شناسه پرداخت (اختیاری)'),
+                    const InputLabel(text: 'شبکه‌های اجتماعی (اختیاری)'),
                     _buildTextField(
                       controller: _upiController,
-                      hint: 'اختیاری',
+                      hint: 'مثلاً: @depir.ir',
                     ),
                     const SizedBox(height: 15),
                     Row(
