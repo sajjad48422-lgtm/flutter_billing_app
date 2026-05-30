@@ -5,6 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:screenshot/screenshot.dart';
+import 'package:share_plus/share_plus.dart';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 
 import '../../../shop/presentation/bloc/shop_bloc.dart';
 import '../bloc/billing_bloc.dart';
@@ -17,6 +21,7 @@ class CheckoutPage extends StatefulWidget {
 }
 
 class _CheckoutPageState extends State<CheckoutPage> {
+  final ScreenshotController _screenshotController = ScreenshotController();
 
   String _buildSmsText({
     required String shopName,
@@ -57,6 +62,160 @@ class _CheckoutPageState extends State<CheckoutPage> {
         );
       }
     }
+  }
+
+  Future<void> _shareAsImage({
+    required BuildContext context,
+    required String shopName,
+    required List cartItems,
+    required double subtotal,
+    required double vatAmount,
+    required double total,
+  }) async {
+    try {
+      final image = await _screenshotController.captureFromWidget(
+        _buildReceiptWidget(
+          shopName: shopName,
+          cartItems: cartItems,
+          subtotal: subtotal,
+          vatAmount: vatAmount,
+          total: total,
+        ),
+        pixelRatio: 3.0,
+      );
+
+      final dir = await getTemporaryDirectory();
+      final file = File('${dir.path}/depir_receipt.png');
+      await file.writeAsBytes(image);
+
+      await Share.shareXFiles(
+        [XFile(file.path)],
+        text: 'فاکتور $shopName',
+      );
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('خطا در اشتراک‌گذاری: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Widget _buildReceiptWidget({
+    required String shopName,
+    required List cartItems,
+    required double subtotal,
+    required double vatAmount,
+    required double total,
+  }) {
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Container(
+        width: 400,
+        color: Colors.white,
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // هدر
+            Text(
+              shopName,
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'فاکتور فروش',
+              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+            ),
+            const Divider(height: 24),
+
+            // اقلام
+            ...cartItems.map((item) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '${item.product.name} × ${item.quantity}',
+                        style: const TextStyle(
+                            fontSize: 14, color: Colors.black),
+                      ),
+                      Text(
+                        CurrencyFormatter.format(item.total,
+                            showUnit: false),
+                        style: const TextStyle(
+                            fontSize: 14, color: Colors.black),
+                      ),
+                    ],
+                  ),
+                )),
+
+            const Divider(height: 24),
+
+            // جمع
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('جمع کل:',
+                    style: TextStyle(fontSize: 13, color: Colors.black54)),
+                Text(CurrencyFormatter.format(subtotal),
+                    style: const TextStyle(
+                        fontSize: 13, color: Colors.black)),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('مالیات ۹٪:',
+                    style: TextStyle(fontSize: 13, color: Colors.black54)),
+                Text(CurrencyFormatter.format(vatAmount),
+                    style: const TextStyle(
+                        fontSize: 13, color: Colors.black)),
+              ],
+            ),
+            const Divider(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'مبلغ قابل پرداخت:',
+                  style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black),
+                ),
+                Text(
+                  CurrencyFormatter.format(total),
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF6C63FF),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'با تشکر از خرید شما 🙏',
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'دپیر — سیستم فروشگاهی هوشمند',
+              style: TextStyle(fontSize: 11, color: Colors.grey),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -121,7 +280,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   }
 
                   final subtotal = billingState.subtotal;
-                  final vatAmount = TaxCalculator.calculateVat(subtotal);
+                  final vatAmount =
+                      TaxCalculator.calculateVat(subtotal);
                   final total = TaxCalculator.totalWithVat(subtotal);
 
                   return Column(
@@ -137,38 +297,50 @@ class _CheckoutPageState extends State<CheckoutPage> {
                               Container(
                                 decoration: BoxDecoration(
                                   color: Colors.white,
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: borderColor),
+                                  borderRadius:
+                                      BorderRadius.circular(12),
+                                  border:
+                                      Border.all(color: borderColor),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withValues(alpha: 0.05),
+                                      color: Colors.black
+                                          .withValues(alpha: 0.05),
                                       blurRadius: 12,
                                       offset: const Offset(0, 4),
                                     ),
                                   ],
                                 ),
                                 child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
+                                  borderRadius:
+                                      BorderRadius.circular(12),
                                   child: Table(
                                     border: const TableBorder(
-                                      horizontalInside: BorderSide(color: borderColor),
-                                      bottom: BorderSide(color: borderColor),
+                                      horizontalInside: BorderSide(
+                                          color: borderColor),
+                                      bottom: BorderSide(
+                                          color: borderColor),
                                     ),
                                     children: [
                                       TableRow(
-                                        decoration: const BoxDecoration(
+                                        decoration:
+                                            const BoxDecoration(
                                           color: Color(0xFFF8FAFC),
                                           border: Border(
-                                            bottom: BorderSide(color: borderColor),
+                                            bottom: BorderSide(
+                                                color: borderColor),
                                           ),
                                         ),
                                         children: [
-                                          _buildHeaderCell('نام کالا', TextAlign.right),
-                                          _buildHeaderCell('قیمت', TextAlign.center),
-                                          _buildHeaderCell('جمع', TextAlign.left),
+                                          _buildHeaderCell('نام کالا',
+                                              TextAlign.right),
+                                          _buildHeaderCell(
+                                              'قیمت', TextAlign.center),
+                                          _buildHeaderCell(
+                                              'جمع', TextAlign.left),
                                         ],
                                       ),
-                                      ...billingState.cartItems.map((item) {
+                                      ...billingState.cartItems
+                                          .map((item) {
                                         return TableRow(
                                           children: [
                                             _buildDataCell(
@@ -203,19 +375,23 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
                                   color: Colors.white,
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: borderColor),
+                                  borderRadius:
+                                      BorderRadius.circular(12),
+                                  border:
+                                      Border.all(color: borderColor),
                                 ),
                                 child: Column(
                                   children: [
                                     _buildSummaryRow(
                                       'جمع کل',
-                                      CurrencyFormatter.format(subtotal),
+                                      CurrencyFormatter.format(
+                                          subtotal),
                                     ),
                                     const SizedBox(height: 8),
                                     _buildSummaryRow(
                                       TaxCalculator.vatLabel,
-                                      CurrencyFormatter.format(vatAmount),
+                                      CurrencyFormatter.format(
+                                          vatAmount),
                                       isSubtitle: true,
                                     ),
                                     const Divider(height: 20),
@@ -243,15 +419,20 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.05),
+                              color:
+                                  Colors.black.withValues(alpha: 0.05),
                               blurRadius: 10,
                               offset: const Offset(0, -4),
                             ),
                           ],
                         ),
                         child: Padding(
-                          padding: EdgeInsets.fromLTRB(16, 12, 16, 
-    MediaQuery.of(context).padding.bottom + 24),
+                          padding: EdgeInsets.fromLTRB(
+                              16,
+                              12,
+                              16,
+                              MediaQuery.of(context).padding.bottom +
+                                  16),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -262,35 +443,73 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                   onPressed: () {
                                     final smsText = _buildSmsText(
                                       shopName: shopName,
-                                      cartItems: billingState.cartItems,
+                                      cartItems:
+                                          billingState.cartItems,
                                       subtotal: subtotal,
                                       vatAmount: vatAmount,
                                       total: total,
                                     );
                                     _openSmsApp(context, smsText);
                                   },
-                                  icon: const Icon(Icons.sms_outlined),
-                                  label: const Text('ارسال فاکتور با پیامک'),
+                                  icon:
+                                      const Icon(Icons.sms_outlined),
+                                  label: const Text(
+                                      'ارسال فاکتور با پیامک'),
                                   style: OutlinedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(vertical: 14),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 14),
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius:
+                                          BorderRadius.circular(12),
                                     ),
                                   ),
                                 ),
                               ),
                               const SizedBox(height: 10),
+
+                              // دکمه اشتراک‌گذاری
+                              SizedBox(
+                                width: double.infinity,
+                                child: OutlinedButton.icon(
+                                  onPressed: () => _shareAsImage(
+                                    context: context,
+                                    shopName: shopName,
+                                    cartItems: billingState.cartItems,
+                                    subtotal: subtotal,
+                                    vatAmount: vatAmount,
+                                    total: total,
+                                  ),
+                                  icon: const Icon(Icons.share_outlined),
+                                  label: const Text(
+                                      'اشتراک‌گذاری فاکتور'),
+                                  style: OutlinedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 14),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+
                               // دکمه چاپ
                               PrimaryButton(
                                 onPressed: () {
                                   if (shopState is ShopLoaded) {
                                     context.read<BillingBloc>().add(
                                           PrintReceiptEvent(
-                                            shopName: shopState.shop.name,
-                                            address1: shopState.shop.addressLine1,
-                                            address2: shopState.shop.addressLine2,
-                                            phone: shopState.shop.phoneNumber,
-                                            footer: shopState.shop.footerText,
+                                            shopName:
+                                                shopState.shop.name,
+                                            address1: shopState
+                                                .shop.addressLine1,
+                                            address2: shopState
+                                                .shop.addressLine2,
+                                            phone: shopState
+                                                .shop.phoneNumber,
+                                            footer: shopState
+                                                .shop.footerText,
                                           ),
                                         );
                                   }
@@ -347,7 +566,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 
   Widget _buildSummaryRow(String label, String value,
-      {bool isBold = false, bool isSubtitle = false, bool isLarge = false}) {
+      {bool isBold = false,
+      bool isSubtitle = false,
+      bool isLarge = false}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -364,7 +585,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
           style: TextStyle(
             fontSize: isLarge ? 18 : 14,
             fontWeight: isBold ? FontWeight.bold : FontWeight.w500,
-            color: isLarge ? Theme.of(context).primaryColor : Colors.black87,
+            color: isLarge
+                ? Theme.of(context).primaryColor
+                : Colors.black87,
           ),
         ),
       ],
