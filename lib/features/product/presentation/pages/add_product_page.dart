@@ -114,7 +114,7 @@ class _AddProductPageState extends State<AddProductPage> {
         pixelRatio: 3.0,
       );
 
-      await Gal.putImageBytes(image, name: 'barcode_$_barcode');
+      await Gal.putImageBytes(image, album: 'دپیر');
 
 if (mounted) {
   if (true) {
