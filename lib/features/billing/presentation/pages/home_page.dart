@@ -96,17 +96,19 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         bottomSheet: BlocBuilder<BillingBloc, BillingState>(
-          builder: (context, state) {
-            return PrimaryButton(
-              onPressed: state.cartItems.isEmpty
-                  ? null
-                  : () async {
-                      _scannerController.stop();
-                      await context.push('/checkout');
-                      if (_isCameraOn && mounted) _scannerController.start();
-                    },
-              icon: Icons.payment,
-              label: 'بررسی سفارش',
+  builder: (context, state) {
+    return SafeArea(
+      child: PrimaryButton(
+        onPressed: state.cartItems.isEmpty
+            ? null
+            : () async {
+                _scannerController.stop();
+                await context.push('/checkout');
+                if (_isCameraOn && mounted) _scannerController.start();
+              },
+        icon: Icons.payment,
+        label: 'بررسی سفارش',
+              ),
             );
           },
         ),
