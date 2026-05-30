@@ -7,7 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:screenshot/screenshot.dart';
-import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
+import 'package:gal/gal.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../bloc/product_bloc.dart';
@@ -114,14 +114,10 @@ class _AddProductPageState extends State<AddProductPage> {
         pixelRatio: 3.0,
       );
 
-      final result = await ImageGallerySaverPlus.saveImage(
-        image,
-        name: 'barcode_${_barcode}',
-        quality: 100,
-      );
+      await Gal.putImageBytes(image, name: 'barcode_$_barcode');
 
-      if (mounted) {
-        if (result['isSuccess'] == true) {
+if (mounted) {
+  if (true) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('بارکد در گالری ذخیره شد ✓'),
