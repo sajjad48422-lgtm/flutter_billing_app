@@ -1,9 +1,14 @@
 import 'package:depir/core/widgets/input_label.dart';
 import 'package:depir/core/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
+import 'package:barcode_widget/barcode_widget.dart';
+import 'package:screenshot/screenshot.dart';
+import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../bloc/product_bloc.dart';
 import '../../domain/entities/product.dart';
@@ -19,18 +24,21 @@ class AddProductPage extends StatefulWidget {
 
 class _AddProductPageState extends State<AddProductPage> {
   final _formKey = GlobalKey<FormState>();
+  final ScreenshotController _screenshotController = ScreenshotController();
   String _name = '';
   String _barcode = '';
   double _price = 0.0;
   int _stock = 0;
   int _lowStockThreshold = 2;
   ProductUnit _unit = ProductUnit.piece;
+  bool _barcodeGenerated = false;
 
   void _scanBarcode() async {
     final result = await context.push<String>('/scanner');
     if (result != null && result.isNotEmpty) {
       setState(() {
         _barcode = result;
+        _barcodeGenerated = false;
       });
     }
   }
@@ -39,7 +47,106 @@ class _AddProductPageState extends State<AddProductPage> {
     final generated = DateTime.now().millisecondsSinceEpoch.toString();
     setState(() {
       _barcode = generated;
+      _barcodeGenerated = true;
     });
+  }
+
+  Future<void> _saveBarcodeToGallery() async {
+    if (_barcode.isEmpty) return;
+
+    final status = await Permission.storage.request();
+    if (!status.isGranted) {
+      final photos = await Permission.photos.request();
+      if (!photos.isGranted) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('دسترسی به گالری داده نشد!'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        return;
+      }
+    }
+
+    try {
+      final image = await _screenshotController.captureFromWidget(
+        Directionality(
+          textDirection: TextDirection.rtl,
+          child: Container(
+            color: Colors.white,
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  _name.isNotEmpty ? _name : 'کالا',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                BarcodeWidget(
+                  barcode: Barcode.code128(),
+                  data: _barcode,
+                  width: 280,
+                  height: 100,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.black,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  _barcode,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.black54,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        pixelRatio: 3.0,
+      );
+
+      final result = await ImageGallerySaverPlus.saveImage(
+        image,
+        name: 'barcode_${_barcode}',
+        quality: 100,
+      );
+
+      if (mounted) {
+        if (result['isSuccess'] == true) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('بارکد در گالری ذخیره شد ✓'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('خطا در ذخیره بارکد!'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('خطا: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   void _submit() {
@@ -120,7 +227,6 @@ class _AddProductPageState extends State<AddProductPage> {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      // دکمه اسکن
                       Container(
                         decoration: BoxDecoration(
                           color: AppTheme.primaryColor
@@ -136,7 +242,6 @@ class _AddProductPageState extends State<AddProductPage> {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      // دکمه ساخت بارکد
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.green.withValues(alpha: 0.1),
@@ -158,6 +263,69 @@ class _AddProductPageState extends State<AddProductPage> {
                     style: TextStyle(
                         fontSize: 12, color: Color(0xFF4C669A)),
                   ),
+
+                  // نمایش بارکد ساخته شده
+                  if (_barcodeGenerated && _barcode.isNotEmpty) ...[
+                    const SizedBox(height: 16),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.green.withValues(alpha: 0.05),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                            color: Colors.green.withValues(alpha: 0.3)),
+                      ),
+                      child: Column(
+                        children: [
+                          const Text(
+                            'بارکد ساخته شد',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Screenshot(
+                            controller: _screenshotController,
+                            child: Container(
+                              color: Colors.white,
+                              padding: const EdgeInsets.all(12),
+                              child: BarcodeWidget(
+                                barcode: Barcode.code128(),
+                                data: _barcode,
+                                width: 250,
+                                height: 80,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton.icon(
+                              onPressed: _saveBarcodeToGallery,
+                              icon: const Icon(Icons.save_alt),
+                              label: const Text('ذخیره در گالری'),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.green,
+                                side: const BorderSide(
+                                    color: Colors.green),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+
                   const SizedBox(height: 24),
 
                   // نام کالا
@@ -180,7 +348,8 @@ class _AddProductPageState extends State<AddProductPage> {
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: Colors.grey[300]!),
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16),
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<ProductUnit>(
                         value: _unit,
@@ -204,14 +373,14 @@ class _AddProductPageState extends State<AddProductPage> {
                   // قیمت
                   const InputLabel(text: 'قیمت (تومان)'),
                   TextFormField(
-                    keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true),
+                    keyboardType:
+                        const TextInputType.numberWithOptions(
+                            decimal: true),
                     textDirection: TextDirection.ltr,
-                    decoration: const InputDecoration(
-                      hintText: '0',
-                    ),
+                    decoration: const InputDecoration(hintText: '0'),
                     validator: AppValidators.price,
-                    onSaved: (value) => _price = double.parse(value!),
+                    onSaved: (value) =>
+                        _price = double.parse(value!),
                   ),
                   const SizedBox(height: 24),
 
@@ -220,9 +389,8 @@ class _AddProductPageState extends State<AddProductPage> {
                   TextFormField(
                     keyboardType: TextInputType.number,
                     textDirection: TextDirection.ltr,
-                    decoration: const InputDecoration(
-                      hintText: '0',
-                    ),
+                    decoration:
+                        const InputDecoration(hintText: '0'),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'لطفاً موجودی را وارد کنید';
@@ -232,11 +400,12 @@ class _AddProductPageState extends State<AddProductPage> {
                       }
                       return null;
                     },
-                    onSaved: (value) => _stock = int.parse(value!),
+                    onSaved: (value) =>
+                        _stock = int.parse(value!),
                   ),
                   const SizedBox(height: 24),
 
-                  // حد هشدار موجودی
+                  // هشدار موجودی
                   const InputLabel(text: 'هشدار کمبود موجودی'),
                   TextFormField(
                     keyboardType: TextInputType.number,
@@ -248,15 +417,15 @@ class _AddProductPageState extends State<AddProductPage> {
                           'وقتی موجودی به این عدد رسید هشدار داده می‌شود',
                     ),
                     validator: (value) {
-                      if (value == null || value.isEmpty) return null;
+                      if (value == null || value.isEmpty)
+                        return null;
                       if (int.tryParse(value) == null) {
                         return 'عدد صحیح وارد کنید';
                       }
                       return null;
                     },
-                    onSaved: (value) =>
-                        _lowStockThreshold =
-                            int.tryParse(value ?? '2') ?? 2,
+                    onSaved: (value) => _lowStockThreshold =
+                        int.tryParse(value ?? '2') ?? 2,
                   ),
                 ],
               ),
