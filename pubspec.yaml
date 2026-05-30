@@ -34,6 +34,7 @@ dependencies:
   url_launcher: ^6.3.0
   barcode_widget: ^2.0.4
   screenshot: ^3.0.0
+  share_plus: ^10.0.0
   image_gallery_saver_plus: ^3.0.2
   shamsi_date: ^0.16.0
   persian_number_utility: ^1.1.4
