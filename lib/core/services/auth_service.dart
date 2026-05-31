@@ -62,4 +62,17 @@ class AuthService {
   static Future<void> clearAuth() async {
     await _storage.deleteAll();
   }
+
+  /// ✅ وضعیت قفل بودن اپ
+  static bool _isUnlocked = false;
+
+  static bool get isUnlocked => _isUnlocked;
+
+  static void unlock() {
+    _isUnlocked = true;
+  }
+
+  static void lock() {
+    _isUnlocked = false;
+  }
 }
