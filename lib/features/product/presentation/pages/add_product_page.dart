@@ -428,10 +428,13 @@ if (mounted) {
             ),
           ),
         ),
-        bottomNavigationBar: PrimaryButton(
-          onPressed: _submit,
-          icon: Icons.add_circle,
-          label: 'افزودن کالا',
+        bottomNavigationBar: SafeArea(
+  child: PrimaryButton(
+    onPressed: _submit,
+    icon: Icons.add_circle,
+    label: 'افزودن کالا',
+            ),
+          ),
         ),
       ),
     );
