@@ -16,14 +16,13 @@ class ShopRepositoryImpl implements ShopRepository {
       if (shop != null) {
         return Right(shop);
       } else {
-        // Return default shop if not found
-        return const Right(Shop(
-            name: 'Dinesh Shop',
-            addressLine1: 'Samrajpet, Mecheri',
-            addressLine2: 'Salem - 636453',
-            phoneNumber: '+917010674588',
-            upiId: 'dineshsowndar@oksbi',
-            footerText: 'Thank you, Visit again!!!'));
+        // return const Right(Shop(
+    name: 'نام فروشگاه',
+    addressLine1: 'آدرس فروشگاه',
+    addressLine2: '',
+    phoneNumber: '',
+    upiId: '',
+    footerText: 'با تشکر از خرید شما'));
       }
     } catch (e) {
       return Left(CacheFailure(e.toString()));
