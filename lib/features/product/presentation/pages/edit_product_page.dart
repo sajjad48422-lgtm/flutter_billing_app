@@ -181,7 +181,6 @@ class _EditProductPageState extends State<EditProductPage> {
     onPressed: _submit,
     icon: Icons.save,
     label: 'ذخیره تغییرات',
-          ),
          ),
         ),
       ),
