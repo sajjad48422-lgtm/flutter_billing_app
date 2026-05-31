@@ -15,15 +15,16 @@ class ShopRepositoryImpl implements ShopRepository {
       final shop = box.get(shopKey);
       if (shop != null) {
         return Right(shop);
-      } else {
-        // return const Right(Shop(
-    name: 'نام فروشگاه',
-    addressLine1: 'آدرس فروشگاه',
-    addressLine2: '',
-    phoneNumber: '',
-    upiId: '',
-    footerText: 'با تشکر از خرید شما'));
-      }
+     } else {
+        return const Right(Shop(
+          name: 'نام فروشگاه',
+          addressLine1: 'آدرس فروشگاه',
+          addressLine2: '',
+          phoneNumber: '',
+          upiId: '',
+          footerText: 'با تشکر از خرید شما',
+        ));
+      }      }
     } catch (e) {
       return Left(CacheFailure(e.toString()));
     }
