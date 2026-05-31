@@ -1,8 +1,10 @@
+import 'dart:io';
 import 'package:depir/core/widgets/input_label.dart';
 import 'package:depir/core/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../domain/entities/shop.dart';
 import '../bloc/shop_bloc.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -23,6 +25,8 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
   late TextEditingController _phoneController;
   late TextEditingController _upiController;
   late TextEditingController _footerController;
+  String _logoPath = '';
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
@@ -44,6 +48,9 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
       _phoneController.text = shop.phoneNumber;
       _upiController.text = shop.upiId;
       _footerController.text = shop.footerText;
+      setState(() {
+        _logoPath = shop.logoPath;
+      });
     }
   }
 
@@ -58,6 +65,20 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
     super.dispose();
   }
 
+  Future<void> _pickLogo() async {
+    final XFile? image = await _picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 512,
+      maxHeight: 512,
+      imageQuality: 85,
+    );
+    if (image != null) {
+      setState(() {
+        _logoPath = image.path;
+      });
+    }
+  }
+
   void _saveShop() {
     if (_formKey.currentState!.validate()) {
       final shop = Shop(
@@ -67,6 +88,7 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
         phoneNumber: _phoneController.text,
         upiId: _upiController.text,
         footerText: _footerController.text,
+        logoPath: _logoPath,
       );
       context.read<ShopBloc>().add(UpdateShopEvent(shop));
     }
@@ -123,25 +145,85 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    // لوگو فروشگاه
+                    Center(
+                      child: GestureDetector(
+                        onTap: _pickLogo,
+                        child: Container(
+                          width: 110,
+                          height: 110,
+                          decoration: BoxDecoration(
+                            color: AppTheme.primaryColor
+                                .withValues(alpha: 0.1),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: AppTheme.primaryColor
+                                  .withValues(alpha: 0.3),
+                              width: 2,
+                            ),
+                          ),
+                          child: _logoPath.isNotEmpty &&
+                                  File(_logoPath).existsSync()
+                              ? ClipOval(
+                                  child: Image.file(
+                                    File(_logoPath),
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                              : Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.add_a_photo_outlined,
+                                      color: AppTheme.primaryColor,
+                                      size: 32,
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      'لوگو فروشگاه',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: AppTheme.primaryColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Center(
+                      child: Text(
+                        'برای تغییر لوگو روی تصویر بزنید',
+                        style: TextStyle(
+                            fontSize: 11, color: Colors.grey[400]),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
                     Text(
                       'اطلاعات عمومی',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.5,
-                        color: AppTheme.primaryColor.withValues(alpha: 0.8),
+                        color: AppTheme.primaryColor
+                            .withValues(alpha: 0.8),
                       ),
                     ),
                     const SizedBox(height: 5),
                     Text(
                       'این اطلاعات روی رسیدهای چاپی و دیجیتال نمایش داده می‌شود.',
-                      style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                      style: TextStyle(
+                          fontSize: 12, color: Colors.grey[500]),
                     ),
                     const SizedBox(height: 24),
+
                     const InputLabel(text: 'نام فروشگاه'),
                     _buildTextField(
                       controller: _nameController,
-                      hint: 'مثلاً: سوپرمارکت سجاد',
+                      hint: 'مثلاً: سوپرمارکت ایران',
                       validator: AppValidators.required('الزامی'),
                     ),
                     const SizedBox(height: 15),
