@@ -277,10 +277,13 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
             );
           },
         ),
-        bottomNavigationBar: PrimaryButton(
-          onPressed: _saveShop,
-          icon: Icons.save,
-          label: 'ذخیره اطلاعات',
+        bottomNavigationBar: SafeArea(
+         child: PrimaryButton(
+         onPressed: _saveShop,
+         icon: Icons.save,
+         label: 'ذخیره اطلاعات',
+            ),
+          ),
         ),
       ),
     );
