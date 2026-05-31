@@ -162,7 +162,9 @@ class _LockScreenPageState extends State<LockScreenPage> {
   }
 
   Widget _buildKeypad() {
-    return Padding(
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 48),
       child: Column(
         children: [
