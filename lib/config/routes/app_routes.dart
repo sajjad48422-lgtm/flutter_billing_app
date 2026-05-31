@@ -22,8 +22,8 @@ final router = GoRouter(
     final isPinSetup = state.matchedLocation == '/pin-setup';
 
     if (!hasPIN && !isPinSetup) return '/pin-setup';
-    if (hasPIN && !isLockScreen && !isPinSetup) {
-      return null;
+    if (hasPIN && !AuthService.isUnlocked && !isLockScreen && !isPinSetup) {
+      return '/lock';
     }
     return null;
   },
