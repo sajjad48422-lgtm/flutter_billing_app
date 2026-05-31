@@ -62,6 +62,7 @@ class _LockScreenPageState extends State<LockScreenPage> {
   Future<void> _checkPIN() async {
     final correct = await AuthService.checkPIN(_pin);
     if (correct && mounted) {
+      AuthService.unlock();
       context.go('/');
     } else {
       setState(() {
@@ -70,7 +71,6 @@ class _LockScreenPageState extends State<LockScreenPage> {
       });
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Directionality(
