@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -68,31 +69,44 @@ class _SettingsPageState extends State<SettingsPage> {
 
                     return Column(
                       children: [
-                        Container(
-                          width: 96,
-                          height: 96,
-                          decoration: BoxDecoration(
-                            color: AppTheme.primaryColor,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppTheme.primaryColor
-                                    .withValues(alpha: 0.2),
-                                blurRadius: 15,
-                                spreadRadius: 5,
-                              )
-                            ],
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            initials,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 32,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
+                 Container(
+  width: 96,
+  height: 96,
+  decoration: BoxDecoration(
+    color: AppTheme.primaryColor,
+    shape: BoxShape.circle,
+    boxShadow: [
+      BoxShadow(
+        color: AppTheme.primaryColor
+            .withValues(alpha: 0.2),
+        blurRadius: 15,
+        spreadRadius: 5,
+      )
+    ],
+  ),
+  child: (state is ShopLoaded &&
+          state.shop.logoPath.isNotEmpty &&
+          File(state.shop.logoPath).existsSync())
+      ? ClipOval(
+          child: Image.file(
+            File(state.shop.logoPath),
+            fit: BoxFit.cover,
+            width: 96,
+            height: 96,
+          ),
+        )
+      : Align(
+          alignment: Alignment.center,
+          child: Text(
+            initials,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ),
                         const SizedBox(height: 16),
                         Text(
                           shopName,
