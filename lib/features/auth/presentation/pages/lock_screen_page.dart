@@ -34,10 +34,10 @@ class _LockScreenPageState extends State<LockScreenPage> {
   Future<void> _authenticateWithBiometric() async {
     final success = await AuthService.authenticateWithBiometric();
     if (success && mounted) {
+      AuthService.unlock();
       context.go('/');
     }
   }
-
   void _onKeyPress(String key) {
     setState(() {
       _error = '';
