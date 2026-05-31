@@ -55,6 +55,7 @@ class _PinSetupPageState extends State<PinSetupPage> {
   Future<void> _validatePins() async {
     if (_pin == _confirmPin) {
       await AuthService.setPIN(_pin);
+      AuthService.unlock();
       if (mounted) context.go('/');
     } else {
       setState(() {
