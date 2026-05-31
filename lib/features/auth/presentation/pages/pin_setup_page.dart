@@ -155,7 +155,9 @@ class _PinSetupPageState extends State<PinSetupPage> {
   }
 
   Widget _buildKeypad() {
-    return Padding(
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 48),
       child: Column(
         children: [
