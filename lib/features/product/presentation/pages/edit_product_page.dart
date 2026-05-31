@@ -176,10 +176,13 @@ class _EditProductPageState extends State<EditProductPage> {
             ),
           ),
         ),
-        bottomNavigationBar: PrimaryButton(
-          onPressed: _submit,
-          icon: Icons.save,
-          label: 'ذخیره تغییرات',
+        bottomNavigationBar: SafeArea(
+  child: PrimaryButton(
+    onPressed: _submit,
+    icon: Icons.save,
+    label: 'ذخیره تغییرات',
+          ),
+         ),
         ),
       ),
     );
