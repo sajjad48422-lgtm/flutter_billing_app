@@ -433,7 +433,6 @@ if (mounted) {
     onPressed: _submit,
     icon: Icons.add_circle,
     label: 'افزودن کالا',
-            ),
           ),
         ),
       ),
