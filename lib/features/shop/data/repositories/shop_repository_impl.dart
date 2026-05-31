@@ -24,7 +24,7 @@ class ShopRepositoryImpl implements ShopRepository {
           upiId: '',
           footerText: 'با تشکر از خرید شما',
         ));
-      }      }
+      }      
     } catch (e) {
       return Left(CacheFailure(e.toString()));
     }
