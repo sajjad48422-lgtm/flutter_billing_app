@@ -106,7 +106,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ),
 
-              const SizedBox(height: 24),
+              SizedBox(height: MediaQuery.of(context).padding.bottom + 48),
 
               // بخش مدیریت
               _buildSectionHeader('مدیریت'),
