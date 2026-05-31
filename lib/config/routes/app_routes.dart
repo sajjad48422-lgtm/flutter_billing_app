@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/billing/presentation/pages/home_page.dart';
 import '../../features/product/presentation/pages/product_list_page.dart';
@@ -6,15 +7,26 @@ import '../../features/product/presentation/pages/edit_product_page.dart';
 import '../../features/shop/presentation/pages/shop_details_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
 import '../../features/settings/presentation/pages/about_page.dart';
-import '../../features/auth/presentation/pages/pin_setup_page.dart';
-import '../../features/auth/presentation/pages/lock_screen_page.dart';
-import '../../core/services/auth_service.dart';
 import '../../features/billing/presentation/pages/scanner_page.dart';
 import '../../features/billing/presentation/pages/checkout_page.dart';
 import '../../features/product/domain/entities/product.dart';
+import '../../features/auth/presentation/pages/pin_setup_page.dart';
+import '../../features/auth/presentation/pages/lock_screen_page.dart';
+import '../../core/services/auth_service.dart';
 
 final router = GoRouter(
   initialLocation: '/',
+  redirect: (context, state) async {
+    final hasPIN = await AuthService.hasPIN();
+    final isLockScreen = state.matchedLocation == '/lock';
+    final isPinSetup = state.matchedLocation == '/pin-setup';
+
+    if (!hasPIN && !isPinSetup) return '/pin-setup';
+    if (hasPIN && !isLockScreen && !isPinSetup) {
+      return null;
+    }
+    return null;
+  },
   routes: [
     GoRoute(
       path: '/',
@@ -50,9 +62,7 @@ final router = GoRouter(
           path: 'edit/:id',
           builder: (context, state) {
             final product = state.extra as Product?;
-            if (product == null) {
-              return const ProductListPage();
-            }
+            if (product == null) return const ProductListPage();
             return EditProductPage(product: product);
           },
         ),
@@ -61,6 +71,14 @@ final router = GoRouter(
     GoRoute(
       path: '/shop',
       builder: (context, state) => const ShopDetailsPage(),
+    ),
+    GoRoute(
+      path: '/pin-setup',
+      builder: (context, state) => const PinSetupPage(),
+    ),
+    GoRoute(
+      path: '/lock',
+      builder: (context, state) => const LockScreenPage(),
     ),
   ],
 );
