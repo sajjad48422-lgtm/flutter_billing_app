@@ -256,7 +256,18 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
 
               const SizedBox(height: 24),
-
+              const SizedBox(height: 24),
+_buildSectionHeader('امنیت'),
+_buildListGroup(
+  children: [
+    _buildListItem(
+      icon: Icons.lock_outline,
+      title: 'تغییر PIN',
+      subtitle: 'تغییر رمز ورود به برنامه',
+      onTap: () => context.push('/pin-setup'),
+    ),
+  ],
+),
               // بخش درباره ما
               _buildSectionHeader('درباره'),
               _buildListGroup(
