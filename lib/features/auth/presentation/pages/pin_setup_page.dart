@@ -79,7 +79,6 @@ class _PinSetupPageState extends State<PinSetupPage> {
           child: Column(
             children: [
               const SizedBox(height: 60),
-              // لوگو
               Container(
                 width: 80,
                 height: 80,
@@ -114,8 +113,6 @@ class _PinSetupPageState extends State<PinSetupPage> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 40),
-
-              // نمایش PIN
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(4, (i) {
@@ -126,14 +123,11 @@ class _PinSetupPageState extends State<PinSetupPage> {
                     height: 18,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: filled
-                          ? AppTheme.primaryColor
-                          : Colors.grey[300],
+                      color: filled ? AppTheme.primaryColor : Colors.grey[300],
                     ),
                   );
                 }),
               ),
-
               if (_error.isNotEmpty) ...[
                 const SizedBox(height: 16),
                 Text(
@@ -141,10 +135,7 @@ class _PinSetupPageState extends State<PinSetupPage> {
                   style: const TextStyle(color: Colors.red, fontSize: 13),
                 ),
               ],
-
               const Spacer(),
-
-              // صفحه کلید
               _buildKeypad(),
               const SizedBox(height: 32),
             ],
@@ -158,24 +149,25 @@ class _PinSetupPageState extends State<PinSetupPage> {
     return Directionality(
       textDirection: TextDirection.ltr,
       child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 48),
-      child: Column(
-        children: [
-          _buildKeyRow(['۱', '۲', '۳']),
-          const SizedBox(height: 16),
-          _buildKeyRow(['۴', '۵', '۶']),
-          const SizedBox(height: 16),
-          _buildKeyRow(['۷', '۸', '۹']),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              const SizedBox(width: 72),
-              _buildKey('۰'),
-              _buildDeleteKey(),
-            ],
-          ),
-        ],
+        padding: const EdgeInsets.symmetric(horizontal: 48),
+        child: Column(
+          children: [
+            _buildKeyRow(['۱', '۲', '۳']),
+            const SizedBox(height: 16),
+            _buildKeyRow(['۴', '۵', '۶']),
+            const SizedBox(height: 16),
+            _buildKeyRow(['۷', '۸', '۹']),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                const SizedBox(width: 72),
+                _buildKey('۰'),
+                _buildDeleteKey(),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
