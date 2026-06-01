@@ -1,7 +1,6 @@
 import 'package:depir/core/widgets/input_label.dart';
 import 'package:depir/core/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
@@ -116,22 +115,13 @@ class _AddProductPageState extends State<AddProductPage> {
 
       await Gal.putImageBytes(image, album: 'دپیر');
 
-if (mounted) {
-  if (true) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('بارکد در گالری ذخیره شد ✓'),
-              backgroundColor: Colors.green,
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('خطا در ذخیره بارکد!'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('بارکد در گالری ذخیره شد ✓'),
+            backgroundColor: Colors.green,
+          ),
+        );
       }
     } catch (e) {
       if (mounted) {
@@ -192,20 +182,20 @@ if (mounted) {
                 size: 28, color: Theme.of(context).primaryColor),
             onPressed: () => context.pop(),
           ),
-          title: const Text('افزودن کالا',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+          title: const Text(
+            'افزودن کالا',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          ),
           centerTitle: true,
         ),
         body: SafeArea(
           child: SingleChildScrollView(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
             child: Form(
               key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // بارکد
                   const InputLabel(text: 'بارکد'),
                   Row(
                     children: [
@@ -225,8 +215,7 @@ if (mounted) {
                       const SizedBox(width: 8),
                       Container(
                         decoration: BoxDecoration(
-                          color: AppTheme.primaryColor
-                              .withValues(alpha: 0.1),
+                          color: AppTheme.primaryColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: IconButton(
@@ -256,11 +245,9 @@ if (mounted) {
                   const SizedBox(height: 6),
                   const Text(
                     'برای کالای بدون بارکد روی ✨ بزنید',
-                    style: TextStyle(
-                        fontSize: 12, color: Color(0xFF4C669A)),
+                    style: TextStyle(fontSize: 12, color: Color(0xFF4C669A)),
                   ),
 
-                  // نمایش بارکد ساخته شده
                   if (_barcodeGenerated && _barcode.isNotEmpty) ...[
                     const SizedBox(height: 16),
                     Container(
@@ -308,11 +295,9 @@ if (mounted) {
                               label: const Text('ذخیره در گالری'),
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: Colors.green,
-                                side: const BorderSide(
-                                    color: Colors.green),
+                                side: const BorderSide(color: Colors.green),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(12),
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
                             ),
@@ -323,20 +308,17 @@ if (mounted) {
                   ],
 
                   const SizedBox(height: 24),
-
-                  // نام کالا
                   const InputLabel(text: 'نام کالا'),
                   TextFormField(
                     decoration: const InputDecoration(
                       hintText: 'مثلاً: برنج ایرانی',
                     ),
-                    validator: AppValidators.required(
-                        'لطفاً نام کالا را وارد کنید'),
+                    validator:
+                        AppValidators.required('لطفاً نام کالا را وارد کنید'),
                     onSaved: (value) => _name = value!,
                   ),
                   const SizedBox(height: 24),
 
-                  // واحد سنجش
                   const InputLabel(text: 'واحد سنجش'),
                   Container(
                     decoration: BoxDecoration(
@@ -344,8 +326,7 @@ if (mounted) {
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: Colors.grey[300]!),
                     ),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<ProductUnit>(
                         value: _unit,
@@ -366,27 +347,22 @@ if (mounted) {
                   ),
                   const SizedBox(height: 24),
 
-                  // قیمت
                   const InputLabel(text: 'قیمت (تومان)'),
                   TextFormField(
                     keyboardType:
-                        const TextInputType.numberWithOptions(
-                            decimal: true),
+                        const TextInputType.numberWithOptions(decimal: true),
                     textDirection: TextDirection.ltr,
                     decoration: const InputDecoration(hintText: '0'),
                     validator: AppValidators.price,
-                    onSaved: (value) =>
-                        _price = double.parse(value!),
+                    onSaved: (value) => _price = double.parse(value!),
                   ),
                   const SizedBox(height: 24),
 
-                  // موجودی
                   const InputLabel(text: 'تعداد موجودی'),
                   TextFormField(
                     keyboardType: TextInputType.number,
                     textDirection: TextDirection.ltr,
-                    decoration:
-                        const InputDecoration(hintText: '0'),
+                    decoration: const InputDecoration(hintText: '0'),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'لطفاً موجودی را وارد کنید';
@@ -396,12 +372,10 @@ if (mounted) {
                       }
                       return null;
                     },
-                    onSaved: (value) =>
-                        _stock = int.parse(value!),
+                    onSaved: (value) => _stock = int.parse(value!),
                   ),
                   const SizedBox(height: 24),
 
-                  // هشدار موجودی
                   const InputLabel(text: 'هشدار کمبود موجودی'),
                   TextFormField(
                     keyboardType: TextInputType.number,
@@ -413,15 +387,14 @@ if (mounted) {
                           'وقتی موجودی به این عدد رسید هشدار داده می‌شود',
                     ),
                     validator: (value) {
-                      if (value == null || value.isEmpty)
-                        return null;
+                      if (value == null || value.isEmpty) return null;
                       if (int.tryParse(value) == null) {
                         return 'عدد صحیح وارد کنید';
                       }
                       return null;
                     },
-                    onSaved: (value) => _lowStockThreshold =
-                        int.tryParse(value ?? '2') ?? 2,
+                    onSaved: (value) =>
+                        _lowStockThreshold = int.tryParse(value ?? '2') ?? 2,
                   ),
                 ],
               ),
@@ -429,12 +402,13 @@ if (mounted) {
           ),
         ),
         bottomNavigationBar: SafeArea(
-  child: PrimaryButton(
-    onPressed: _submit,
-    icon: Icons.add_circle,
-    label: 'افزودن کالا',
+          child: PrimaryButton(
+            onPressed: _submit,
+            icon: Icons.add_circle,
+            label: 'افزودن کالا',
           ),
         ),
-      );
-    }
+      ),
+    );
   }
+}
