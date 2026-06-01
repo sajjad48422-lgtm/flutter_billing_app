@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/services/auth_service.dart';
@@ -38,6 +37,7 @@ class _LockScreenPageState extends State<LockScreenPage> {
       context.go('/');
     }
   }
+
   void _onKeyPress(String key) {
     setState(() {
       _error = '';
@@ -71,6 +71,7 @@ class _LockScreenPageState extends State<LockScreenPage> {
       });
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Directionality(
@@ -112,7 +113,6 @@ class _LockScreenPageState extends State<LockScreenPage> {
                 style: TextStyle(fontSize: 13, color: Colors.grey[600]),
               ),
               const SizedBox(height: 40),
-
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(4, (i) {
@@ -123,14 +123,11 @@ class _LockScreenPageState extends State<LockScreenPage> {
                     height: 18,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: filled
-                          ? AppTheme.primaryColor
-                          : Colors.grey[300],
+                      color: filled ? AppTheme.primaryColor : Colors.grey[300],
                     ),
                   );
                 }),
               ),
-
               if (_error.isNotEmpty) ...[
                 const SizedBox(height: 16),
                 Text(
@@ -138,9 +135,7 @@ class _LockScreenPageState extends State<LockScreenPage> {
                   style: const TextStyle(color: Colors.red, fontSize: 13),
                 ),
               ],
-
               const Spacer(),
-
               if (_biometricAvailable)
                 TextButton.icon(
                   onPressed: _authenticateWithBiometric,
@@ -150,7 +145,6 @@ class _LockScreenPageState extends State<LockScreenPage> {
                     foregroundColor: AppTheme.primaryColor,
                   ),
                 ),
-
               const SizedBox(height: 16),
               _buildKeypad(),
               const SizedBox(height: 32),
@@ -165,24 +159,25 @@ class _LockScreenPageState extends State<LockScreenPage> {
     return Directionality(
       textDirection: TextDirection.ltr,
       child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 48),
-      child: Column(
-        children: [
-          _buildKeyRow(['۱', '۲', '۳']),
-          const SizedBox(height: 16),
-          _buildKeyRow(['۴', '۵', '۶']),
-          const SizedBox(height: 16),
-          _buildKeyRow(['۷', '۸', '۹']),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              const SizedBox(width: 72),
-              _buildKey('۰'),
-              _buildDeleteKey(),
-            ],
-          ),
-        ],
+        padding: const EdgeInsets.symmetric(horizontal: 48),
+        child: Column(
+          children: [
+            _buildKeyRow(['۱', '۲', '۳']),
+            const SizedBox(height: 16),
+            _buildKeyRow(['۴', '۵', '۶']),
+            const SizedBox(height: 16),
+            _buildKeyRow(['۷', '۸', '۹']),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                const SizedBox(width: 72),
+                _buildKey('۰'),
+                _buildDeleteKey(),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
