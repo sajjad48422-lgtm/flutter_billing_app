@@ -63,20 +63,20 @@ class _EditProductPageState extends State<EditProductPage> {
                 size: 32, color: Theme.of(context).primaryColor),
             onPressed: () => context.pop(),
           ),
-          title: const Text('ویرایش کالا',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+          title: const Text(
+            'ویرایش کالا',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          ),
           centerTitle: true,
         ),
         body: SafeArea(
           child: SingleChildScrollView(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
             child: Form(
               key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // بارکد (غیرقابل ویرایش)
                   Container(
                     padding: const EdgeInsets.all(16),
                     margin: const EdgeInsets.only(bottom: 24),
@@ -84,8 +84,7 @@ class _EditProductPageState extends State<EditProductPage> {
                       color: AppTheme.primaryColor.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                          color: AppTheme.primaryColor
-                              .withValues(alpha: 0.1)),
+                          color: AppTheme.primaryColor.withValues(alpha: 0.1)),
                     ),
                     child: Row(
                       children: [
@@ -95,18 +94,24 @@ class _EditProductPageState extends State<EditProductPage> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('بارکد',
-                                style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppTheme.primaryColor
-                                        .withValues(alpha: 0.7))),
+                            Text(
+                              'بارکد',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: AppTheme.primaryColor
+                                    .withValues(alpha: 0.7),
+                              ),
+                            ),
                             const SizedBox(height: 2),
-                            Text(widget.product.barcode,
-                                style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    fontFamily: 'monospace')),
+                            Text(
+                              widget.product.barcode,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                fontFamily: 'monospace',
+                              ),
+                            ),
                           ],
                         ),
                       ],
@@ -125,8 +130,8 @@ class _EditProductPageState extends State<EditProductPage> {
                   const InputLabel(text: 'قیمت (تومان)'),
                   TextFormField(
                     initialValue: _price.toStringAsFixed(0),
-                    keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true),
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
                     textDirection: TextDirection.ltr,
                     validator: AppValidators.price,
                     onSaved: (value) => _price = double.parse(value!),
@@ -168,8 +173,7 @@ class _EditProductPageState extends State<EditProductPage> {
                       return null;
                     },
                     onSaved: (value) =>
-                        _lowStockThreshold =
-                            int.tryParse(value ?? '2') ?? 2,
+                        _lowStockThreshold = int.tryParse(value ?? '2') ?? 2,
                   ),
                 ],
               ),
@@ -177,12 +181,13 @@ class _EditProductPageState extends State<EditProductPage> {
           ),
         ),
         bottomNavigationBar: SafeArea(
-  child: PrimaryButton(
-    onPressed: _submit,
-    icon: Icons.save,
-    label: 'ذخیره تغییرات',
-         ),
+          child: PrimaryButton(
+            onPressed: _submit,
+            icon: Icons.save,
+            label: 'ذخیره تغییرات',
+          ),
         ),
-      );
-    }
+      ),
+    );
   }
+}
