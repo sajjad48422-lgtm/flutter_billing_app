@@ -19,6 +19,7 @@ class BillingBloc extends Bloc<BillingEvent, BillingState> {
     on<AddProductToCartEvent>(_onAddProductToCart);
     on<RemoveProductFromCartEvent>(_onRemoveProductFromCart);
     on<UpdateQuantityEvent>(_onUpdateQuantity);
+    on<UpdateWeightEvent>(_onUpdateWeight);
     on<ClearCartEvent>(_onClearCart);
     on<PrintReceiptEvent>(_onPrintReceipt);
     on<SendSmsReceiptEvent>(_onSendSmsReceipt);
@@ -37,16 +38,24 @@ class BillingBloc extends Bloc<BillingEvent, BillingState> {
   void _onAddProductToCart(
       AddProductToCartEvent event, Emitter<BillingState> emit) {
     final cleanState = state.copyWith(error: null);
+
+    // برای کالاهای وزنی، همیشه یه آیتم جدید اضافه می‌کنیم
+    final newItem = CartItem(
+      product: event.product,
+      weightAmount: event.weightAmount,
+    );
+
     final existingIndex = cleanState.cartItems
         .indexWhere((item) => item.product.id == event.product.id);
-    if (existingIndex >= 0) {
+
+    if (existingIndex >= 0 && !newItem.isWeightBased) {
+      // فقط برای کالاهای تعدادی، تعداد رو زیاد کن
       final existingItem = cleanState.cartItems[existingIndex];
       final updatedItems = List<CartItem>.from(cleanState.cartItems);
       updatedItems[existingIndex] =
           existingItem.copyWith(quantity: existingItem.quantity + 1);
       emit(cleanState.copyWith(cartItems: updatedItems, error: null));
     } else {
-      final newItem = CartItem(product: event.product);
       emit(cleanState.copyWith(
           cartItems: [...cleanState.cartItems, newItem], error: null));
     }
@@ -75,6 +84,21 @@ class BillingBloc extends Bloc<BillingEvent, BillingState> {
     }
   }
 
+  void _onUpdateWeight(
+      UpdateWeightEvent event, Emitter<BillingState> emit) {
+    if (event.weightAmount <= 0) {
+      add(RemoveProductFromCartEvent(event.productId));
+      return;
+    }
+    final index = state.cartItems
+        .indexWhere((item) => item.product.id == event.productId);
+    if (index >= 0) {
+      final items = List<CartItem>.from(state.cartItems);
+      items[index] = items[index].copyWith(weightAmount: event.weightAmount);
+      emit(state.copyWith(cartItems: items));
+    }
+  }
+
   void _onClearCart(ClearCartEvent event, Emitter<BillingState> emit) {
     emit(const BillingState());
   }
@@ -89,15 +113,13 @@ class BillingBloc extends Bloc<BillingEvent, BillingState> {
         final connected = await printerHelper.connect(savedMac);
         if (!connected) {
           emit(state.copyWith(
-              error: 'اتصال به پرینتر ناموفق بود!',
-              clearError: false));
+              error: 'اتصال به پرینتر ناموفق بود!', clearError: false));
           emit(state.copyWith(clearError: true));
           return;
         }
       } else {
         emit(state.copyWith(
-            error: 'پرینتر متصل نیست!',
-            clearError: false));
+            error: 'پرینتر متصل نیست!', clearError: false));
         emit(state.copyWith(clearError: true));
         return;
       }
@@ -110,7 +132,7 @@ class BillingBloc extends Bloc<BillingEvent, BillingState> {
       final items = state.cartItems
           .map((item) => {
                 'name': item.product.name,
-                'qty': item.quantity,
+                'qty': item.isWeightBased ? item.weightAmount : item.quantity,
                 'price': item.product.price,
                 'total': item.total,
               })
@@ -141,8 +163,8 @@ class BillingBloc extends Bloc<BillingEvent, BillingState> {
 
     final items = state.cartItems
         .map((item) => InvoiceItem(
-              name: item.product.name,
-              quantity: item.quantity,
+              name: '${item.product.name} (${item.displayAmount})',
+              quantity: item.isWeightBased ? 1 : item.quantity,
               total: item.total,
             ))
         .toList();
