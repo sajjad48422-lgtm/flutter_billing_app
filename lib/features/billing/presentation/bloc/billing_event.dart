@@ -15,9 +15,10 @@ class ScanBarcodeEvent extends BillingEvent {
 
 class AddProductToCartEvent extends BillingEvent {
   final Product product;
-  const AddProductToCartEvent(this.product);
+  final double weightAmount;
+  const AddProductToCartEvent(this.product, {this.weightAmount = 1.0});
   @override
-  List<Object> get props => [product];
+  List<Object> get props => [product, weightAmount];
 }
 
 class RemoveProductFromCartEvent extends BillingEvent {
@@ -33,6 +34,14 @@ class UpdateQuantityEvent extends BillingEvent {
   const UpdateQuantityEvent(this.productId, this.quantity);
   @override
   List<Object> get props => [productId, quantity];
+}
+
+class UpdateWeightEvent extends BillingEvent {
+  final String productId;
+  final double weightAmount;
+  const UpdateWeightEvent(this.productId, this.weightAmount);
+  @override
+  List<Object> get props => [productId, weightAmount];
 }
 
 class ClearCartEvent extends BillingEvent {}
@@ -56,7 +65,6 @@ class PrintReceiptEvent extends BillingEvent {
   List<Object> get props => [shopName, address1, address2, phone, footer];
 }
 
-// ✅ جدید: ارسال فاکتور با پیامک
 class SendSmsReceiptEvent extends BillingEvent {
   final String customerPhone;
   final String shopName;
