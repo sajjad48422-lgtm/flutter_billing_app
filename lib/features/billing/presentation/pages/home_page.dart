@@ -9,6 +9,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../domain/entities/cart_item.dart';
+import '../../../product/domain/entities/product.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -57,6 +58,70 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  // نمایش دیالوگ مقدار برای کالاهای وزنی
+  Future<void> _showWeightDialog(
+      BuildContext context, Product product) async {
+    final controller = TextEditingController();
+    final result = await showDialog<double>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: AlertDialog(
+          title: Text(product.name),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'مقدار (${product.unit.label}) را وارد کنید:',
+                style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: controller,
+                keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true),
+                textDirection: TextDirection.ltr,
+                autofocus: true,
+                decoration: InputDecoration(
+                  hintText: 'مثلاً: 10.5',
+                  suffixText: product.unit.label,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'قیمت هر ${product.unit.label}: ${CurrencyFormatter.format(product.price)}',
+                style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('انصراف'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final val = double.tryParse(controller.text);
+                if (val != null && val > 0) {
+                  Navigator.pop(ctx, val);
+                }
+              },
+              child: const Text('افزودن'),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (result != null && mounted) {
+      context.read<BillingBloc>().add(
+            AddProductToCartEvent(product, weightAmount: result),
+          );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Directionality(
@@ -96,18 +161,20 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         bottomSheet: BlocBuilder<BillingBloc, BillingState>(
-  builder: (context, state) {
-    return SafeArea(
-      child: PrimaryButton(
-        onPressed: state.cartItems.isEmpty
-            ? null
-            : () async {
-                _scannerController.stop();
-                await context.push('/checkout');
-                if (_isCameraOn && mounted) _scannerController.start();
-              },
-        icon: Icons.payment,
-        label: 'بررسی سفارش',
+          builder: (context, state) {
+            return SafeArea(
+              child: PrimaryButton(
+                onPressed: state.cartItems.isEmpty
+                    ? null
+                    : () async {
+                        _scannerController.stop();
+                        await context.push('/checkout');
+                        if (_isCameraOn && mounted) {
+                          _scannerController.start();
+                        }
+                      },
+                icon: Icons.receipt_long,
+                label: 'ثبت سفارش',
               ),
             );
           },
@@ -447,46 +514,14 @@ class _HomePageState extends State<HomePage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(8),
-            ),
-            padding: const EdgeInsets.all(4),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _circularIconButton(
-                  icon: Icons.remove,
-                  onPressed: () {
-                    if (item.quantity > 1) {
-                      context.read<BillingBloc>().add(UpdateQuantityEvent(
-                          item.product.id, item.quantity - 1));
-                    } else {
-                      context.read<BillingBloc>().add(
-                          RemoveProductFromCartEvent(item.product.id));
-                    }
-                  },
-                ),
-                SizedBox(
-                  width: 32,
-                  child: Text(
-                    '${item.quantity}',
-                    textAlign: TextAlign.center,
-                    style:
-                        const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-                _circularIconButton(
-                  icon: Icons.add,
-                  onPressed: () {
-                    context.read<BillingBloc>().add(UpdateQuantityEvent(
-                        item.product.id, item.quantity + 1));
-                  },
-                ),
-              ],
-            ),
-          ),
+          // کنترل‌های مقدار
+          item.isWeightBased
+              ? _buildWeightControl(context, item)
+              : _buildQuantityControl(context, item),
+
+          const SizedBox(width: 12),
+
+          // اطلاعات کالا
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -501,11 +536,19 @@ class _HomePageState extends State<HomePage> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  CurrencyFormatter.format(item.product.price),
+                  '${CurrencyFormatter.format(item.product.price)} / ${item.product.unit.label}',
+                  style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 12,
+                      color: Colors.grey[600]),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'جمع: ${CurrencyFormatter.format(item.total)}',
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                      color: Colors.grey[600]),
+                      fontSize: 13,
+                      color: Theme.of(context).primaryColor),
                 ),
               ],
             ),
@@ -513,6 +556,143 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
+  }
+
+  // کنترل تعداد برای کالاهای عددی
+  Widget _buildQuantityControl(BuildContext context, CartItem item) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(8),
+      ),
+      padding: const EdgeInsets.all(4),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _circularIconButton(
+            icon: Icons.remove,
+            onPressed: () {
+              if (item.quantity > 1) {
+                context.read<BillingBloc>().add(UpdateQuantityEvent(
+                    item.product.id, item.quantity - 1));
+              } else {
+                context.read<BillingBloc>().add(
+                    RemoveProductFromCartEvent(item.product.id));
+              }
+            },
+          ),
+          SizedBox(
+            width: 32,
+            child: Text(
+              '${item.quantity}',
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+          _circularIconButton(
+            icon: Icons.add,
+            onPressed: () {
+              context.read<BillingBloc>().add(UpdateQuantityEvent(
+                  item.product.id, item.quantity + 1));
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  // کنترل وزن برای کالاهای وزنی
+  Widget _buildWeightControl(BuildContext context, CartItem item) {
+    return Column(
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.grey[100],
+            borderRadius: BorderRadius.circular(8),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Text(
+            item.displayAmount,
+            style: const TextStyle(
+                fontWeight: FontWeight.bold, fontSize: 13),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _circularIconButton(
+              icon: Icons.edit,
+              onPressed: () => _showWeightEditDialog(context, item),
+            ),
+            const SizedBox(width: 4),
+            _circularIconButton(
+              icon: Icons.delete_outline,
+              onPressed: () {
+                context.read<BillingBloc>().add(
+                    RemoveProductFromCartEvent(item.product.id));
+              },
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Future<void> _showWeightEditDialog(
+      BuildContext context, CartItem item) async {
+    final controller = TextEditingController(
+        text: item.weightAmount.toString());
+    final result = await showDialog<double>(
+      context: context,
+      builder: (ctx) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: AlertDialog(
+          title: Text(item.product.name),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'مقدار (${item.product.unit.label}) را ویرایش کنید:',
+                style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: controller,
+                keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true),
+                textDirection: TextDirection.ltr,
+                autofocus: true,
+                decoration: InputDecoration(
+                  suffixText: item.product.unit.label,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('انصراف'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final val = double.tryParse(controller.text);
+                if (val != null && val > 0) {
+                  Navigator.pop(ctx, val);
+                }
+              },
+              child: const Text('ذخیره'),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (result != null && mounted) {
+      context.read<BillingBloc>().add(
+            UpdateWeightEvent(item.product.id, result),
+          );
+    }
   }
 
   Widget _circularIconButton({
