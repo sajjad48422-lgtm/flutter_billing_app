@@ -1,50 +1,22 @@
 import 'package:hive_flutter/hive_flutter.dart';
 
-enum CurrencyUnit { toman, rial }
-
 class CurrencyFormatter {
-  static const String _boxName = 'settings';
-  static const String _currencyKey = 'currency_unit';
-
-  static CurrencyUnit get currentUnit {
-    try {
-      final box = Hive.box(_boxName);
-      final value = box.get(_currencyKey, defaultValue: 'toman');
-      return value == 'rial' ? CurrencyUnit.rial : CurrencyUnit.toman;
-    } catch (_) {
-      return CurrencyUnit.toman;
-    }
-  }
-
-  static Future<void> setUnit(CurrencyUnit unit) async {
-    final box = Hive.box(_boxName);
-    await box.put(
-      _currencyKey,
-      unit == CurrencyUnit.rial ? 'rial' : 'toman',
-    );
-  }
-
+  /// فرمت‌بندی قیمت به ریال با جداکننده هزارگان
+  /// مثال: 1100000 → ۱٬۱۰۰٬۰۰۰ ریال
   static String format(double amount, {bool showUnit = true}) {
-    double displayAmount = amount;
-    if (currentUnit == CurrencyUnit.toman) {
-      displayAmount = amount / 10;
-    }
-
-    final formatted = displayAmount
+    final formatted = amount
         .toStringAsFixed(0)
         .replaceAllMapped(
           RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (m) => '${m[1]}،',
+          (m) => '${m[1]}٬',
         )
         .toPersianDigit();
 
     if (!showUnit) return formatted;
-    final unit = currentUnit == CurrencyUnit.toman ? 'تومان' : 'ریال';
-    return '$formatted $unit';
+    return '$formatted ریال';
   }
 
-  static String get unitName =>
-      currentUnit == CurrencyUnit.toman ? 'تومان' : 'ریال';
+  static String get unitName => 'ریال';
 }
 
 extension PersianDigit on String {
