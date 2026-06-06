@@ -10,13 +10,15 @@ class AppValidators {
 
   static String? price(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return 'Please enter a price';
+      return 'لطفاً قیمت را وارد کنید';
     }
-    if (double.tryParse(value) == null) {
-      return 'Please enter a valid number';
+    // حذف جداکننده‌های هزارگان قبل از parse
+    final cleaned = value.replaceAll(',', '').replaceAll('٬', '');
+    if (double.tryParse(cleaned) == null) {
+      return 'لطفاً یک عدد معتبر وارد کنید';
     }
-    if (double.parse(value) < 0) {
-      return 'Price cannot be negative';
+    if (double.parse(cleaned) < 0) {
+      return 'قیمت نمی‌تواند منفی باشد';
     }
     return null;
   }
