@@ -13,7 +13,7 @@ class TaxCalculator {
   }
 
   /// درصد نمایشی
-  static String get vatPercent => '۹%';
+  static String get vatPercent => '۹٪';
 
   /// نام کامل
   static String get vatLabel => 'مالیات بر ارزش افزوده (۹٪)';
