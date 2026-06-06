@@ -128,19 +128,25 @@ class _HomePageState extends State<HomePage> {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         body: BlocListener<BillingBloc, BillingState>(
-          listenWhen: (previous, current) =>
-              previous.error != current.error && current.error != null,
-          listener: (context, state) {
-            if (state.error != null) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.error!),
-                  backgroundColor: Colors.red,
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-            }
-          },
+  listenWhen: (previous, current) =>
+      (previous.error != current.error && current.error != null) ||
+      (previous.pendingWeightProduct != current.pendingWeightProduct &&
+          current.pendingWeightProduct != null),
+  listener: (context, state) {
+    if (state.error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(state.error!),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+    if (state.pendingWeightProduct != null) {
+      _showWeightDialog(context, state.pendingWeightProduct!);
+      context.read<BillingBloc>().add(ClearPendingProductEvent());
+    }
+  },
           child: Stack(
             children: [
               Positioned(
