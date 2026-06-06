@@ -77,3 +77,4 @@ class SendSmsReceiptEvent extends BillingEvent {
   @override
   List<Object> get props => [customerPhone, shopName];
 }
+class ClearPendingProductEvent extends BillingEvent {}
