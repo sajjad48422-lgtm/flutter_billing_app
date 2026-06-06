@@ -7,6 +7,7 @@ class BillingState extends Equatable {
   final bool printSuccess;
   final bool isSendingSms;
   final bool smsSuccess;
+  final Product? pendingWeightProduct;
 
   const BillingState({
     this.cartItems = const [],
@@ -15,6 +16,7 @@ class BillingState extends Equatable {
     this.printSuccess = false,
     this.isSendingSms = false,
     this.smsSuccess = false,
+    this.pendingWeightProduct,
   });
 
   double get subtotal =>
@@ -32,6 +34,8 @@ class BillingState extends Equatable {
     bool? printSuccess,
     bool? isSendingSms,
     bool? smsSuccess,
+    Product? pendingWeightProduct,
+    bool clearPendingProduct = false,
   }) {
     return BillingState(
       cartItems: cartItems ?? this.cartItems,
@@ -40,6 +44,9 @@ class BillingState extends Equatable {
       printSuccess: printSuccess ?? this.printSuccess,
       isSendingSms: isSendingSms ?? this.isSendingSms,
       smsSuccess: smsSuccess ?? this.smsSuccess,
+      pendingWeightProduct: clearPendingProduct
+          ? null
+          : (pendingWeightProduct ?? this.pendingWeightProduct),
     );
   }
 
@@ -51,5 +58,6 @@ class BillingState extends Equatable {
         printSuccess,
         isSendingSms,
         smsSuccess,
+        pendingWeightProduct,
       ];
 }
