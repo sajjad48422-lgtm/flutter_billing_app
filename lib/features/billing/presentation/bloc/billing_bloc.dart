@@ -26,14 +26,21 @@ class BillingBloc extends Bloc<BillingEvent, BillingState> {
   }
 
   Future<void> _onScanBarcode(
-      ScanBarcodeEvent event, Emitter<BillingState> emit) async {
-    final result = await getProductByBarcodeUseCase(event.barcode);
-    result.fold(
-      (failure) => emit(state.copyWith(
-          error: 'محصول یافت نشد: ${event.barcode}')),
-      (product) => add(AddProductToCartEvent(product)),
-    );
-  }
+    ScanBarcodeEvent event, Emitter<BillingState> emit) async {
+  final result = await getProductByBarcodeUseCase(event.barcode);
+  result.fold(
+    (failure) => emit(state.copyWith(
+        error: 'محصول یافت نشد: ${event.barcode}')),
+    (product) {
+      if (product.isWeightBased) {
+        // برای کالاهای وزنی، state رو آپدیت کن تا UI دیالوگ نشون بده
+        emit(state.copyWith(pendingWeightProduct: product));
+      } else {
+        add(AddProductToCartEvent(product));
+      }
+    },
+  );
+}
 
   void _onAddProductToCart(
       AddProductToCartEvent event, Emitter<BillingState> emit) {
