@@ -38,6 +38,8 @@ class _AddProductPageState extends State<AddProductPage> {
       setState(() {
         _barcode = result;
         _barcodeGenerated = false;
+        final _priceController = TextEditingController();
+final _priceFormatter = NumberFormat('#,###', 'en_US');
       });
     }
   }
