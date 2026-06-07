@@ -206,4 +206,8 @@ class BillingBloc extends Bloc<BillingEvent, BillingState> {
         break;
     }
   }
+void _onClearPendingProduct(
+      ClearPendingProductEvent event, Emitter<BillingState> emit) {
+    emit(state.copyWith(clearPendingProduct: true));
+  }
 }
