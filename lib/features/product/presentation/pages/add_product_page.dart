@@ -371,15 +371,21 @@ final _priceFormatter = NumberFormat('#,###', 'en_US');
                   ),
                   const SizedBox(height: 24),
 
-                  const InputLabel(text: 'قیمت (تومان)'),
-                  TextFormField(
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
-                    textDirection: TextDirection.ltr,
-                    decoration: const InputDecoration(hintText: '0'),
-                    validator: AppValidators.price,
-                    onSaved: (value) => _price = double.parse(value!),
-                  ),
+                  
+const InputLabel(text: 'قیمت (ریال)'),
+TextFormField(
+  controller: _priceController,
+  keyboardType: TextInputType.number,
+  textDirection: TextDirection.ltr,
+  decoration: const InputDecoration(hintText: '0'),
+  validator: (value) {
+    if (value == null || value.isEmpty) return 'لطفاً قیمت را وارد کنید';
+    final clean = value.replaceAll(',', '');
+    if (double.tryParse(clean) == null) return 'عدد معتبر وارد کنید';
+    return null;
+  },
+  onSaved: (value) => _price = double.parse(value!.replaceAll(',', '')),
+),
                   const SizedBox(height: 24),
 
                   const InputLabel(text: 'تعداد موجودی'),
