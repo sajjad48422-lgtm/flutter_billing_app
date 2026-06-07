@@ -31,7 +31,29 @@ class _AddProductPageState extends State<AddProductPage> {
   int _lowStockThreshold = 2;
   ProductUnit _unit = ProductUnit.piece;
   bool _barcodeGenerated = false;
+  @override
+void initState() {
+  super.initState();
+  _priceController.addListener(() {
+    final text = _priceController.text.replaceAll(',', '');
+    if (text.isEmpty) return;
+    final number = int.tryParse(text);
+    if (number == null) return;
+    final formatted = _priceFormatter.format(number);
+    if (_priceController.text != formatted) {
+      _priceController.value = TextEditingValue(
+        text: formatted,
+        selection: TextSelection.collapsed(offset: formatted.length),
+      );
+    }
+  });
+}
 
+@override
+void dispose() {
+  _priceController.dispose();
+  super.dispose();
+}
   void _scanBarcode() async {
     final result = await context.push<String>('/scanner');
     if (result != null && result.isNotEmpty) {
