@@ -22,7 +22,7 @@ class BillingBloc extends Bloc<BillingEvent, BillingState> {
     on<UpdateWeightEvent>(_onUpdateWeight);
     on<ClearCartEvent>(_onClearCart);
     on<PrintReceiptEvent>(_onPrintReceipt);
-    on<SendSmsReceiptEvent>(_onSendSmsReceipt);   on<ClearPendingProductEvent>(_onClearPendingProdu ct);
+    on<SendSmsReceiptEvent>(_onSendSmsReceipt);   on<ClearPendingProductEvent>(_onClearPendingProdct);
   }
 
   Future<void> _onScanBarcode(
