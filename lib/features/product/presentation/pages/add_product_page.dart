@@ -32,39 +32,41 @@ class _AddProductPageState extends State<AddProductPage> {
   ProductUnit _unit = ProductUnit.piece;
   bool _barcodeGenerated = false;
   final _priceController = TextEditingController();
-final _priceFormatter = NumberFormat('#,###', 'en_US');
-final _nameController = TextEditingController();
-  @override
-void initState() {
-  super.initState();
-  _priceController.addListener(() {
-    final text = _priceController.text.replaceAll(',', '');
-    if (text.isEmpty) return;
-    final number = int.tryParse(text);
-    if (number == null) return;
-    final formatted = _priceFormatter.format(number);
-    if (_priceController.text != formatted) {
-      _priceController.value = TextEditingValue(
-        text: formatted,
-        selection: TextSelection.collapsed(offset: formatted.length),
-      );
-    }
-  });
-}
+  final _priceFormatter = NumberFormat('#,###', 'en_US');
+  final _nameController = TextEditingController();
 
-@override
-void dispose() {
-  _priceController.dispose();
-  _nameController.dispose();
-  super.dispose();
-}
+  @override
+  void initState() {
+    super.initState();
+    _priceController.addListener(() {
+      final text = _priceController.text.replaceAll(',', '');
+      if (text.isEmpty) return;
+      final number = int.tryParse(text);
+      if (number == null) return;
+      final formatted = _priceFormatter.format(number);
+      if (_priceController.text != formatted) {
+        _priceController.value = TextEditingValue(
+          text: formatted,
+          selection: TextSelection.collapsed(offset: formatted.length),
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _priceController.dispose();
+    _nameController.dispose();
+    super.dispose();
+  }
+
   void _scanBarcode() async {
     final result = await context.push<String>('/scanner');
     if (result != null && result.isNotEmpty) {
       setState(() {
         _barcode = result;
         _barcodeGenerated = false;
-     }); 
+      });
     }
   }
 
@@ -260,7 +262,9 @@ void dispose() {
                         child: IconButton(
                           icon: const Icon(Icons.auto_awesome,
                               color: Colors.green),
-                          onPressed: _nameController.text.trim().isEmpty ? null : _generateBarcode,
+                          onPressed: _nameController.text.trim().isEmpty
+                              ? null
+                              : _generateBarcode,
                           padding: const EdgeInsets.all(14),
                           tooltip: 'ساخت بارکد خودکار',
                         ),
@@ -295,39 +299,39 @@ void dispose() {
                           ),
                           const SizedBox(height: 12),
                           Screenshot(
-  controller: _screenshotController,
-  child: Container(
-    color: Colors.white,
-    padding: const EdgeInsets.all(12),
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (_nameController.text.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Text(
-              _nameController.text,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-          ),
-        BarcodeWidget(
-          barcode: Barcode.code128(),
-          data: _barcode,
-          width: 250,
-          height: 80,
-          style: const TextStyle(
-            fontSize: 12,
-            color: Colors.black,
-          ),
-        ),
-      ],
-    ),
-  ),
-),
+                            controller: _screenshotController,
+                            child: Container(
+                              color: Colors.white,
+                              padding: const EdgeInsets.all(12),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (_nameController.text.isNotEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.only(bottom: 8),
+                                      child: Text(
+                                        _nameController.text,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                  BarcodeWidget(
+                                    barcode: Barcode.code128(),
+                                    data: _barcode,
+                                    width: 250,
+                                    height: 80,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                           const SizedBox(height: 12),
                           SizedBox(
                             width: double.infinity,
@@ -352,15 +356,15 @@ void dispose() {
                   const SizedBox(height: 24),
                   const InputLabel(text: 'نام کالا'),
                   TextFormField(
-  controller: _nameController,
-  decoration: const InputDecoration(
-    hintText: 'مثلاً: برنج ایرانی',
-  ),
-  onChanged: (value) => setState(() {}),
-  validator:
-      AppValidators.required('لطفاً نام کالا را وارد کنید'),
-  onSaved: (value) => _name = value!,
-),
+                    controller: _nameController,
+                    decoration: const InputDecoration(
+                      hintText: 'مثلاً: برنج ایرانی',
+                    ),
+                    onChanged: (value) => setState(() {}),
+                    validator:
+                        AppValidators.required('لطفاً نام کالا را وارد کنید'),
+                    onSaved: (value) => _name = value!,
+                  ),
                   const SizedBox(height: 24),
 
                   const InputLabel(text: 'واحد سنجش'),
@@ -391,20 +395,22 @@ void dispose() {
                   ),
                   const SizedBox(height: 24),
 
-                  
-const InputLabel(text: 'قیمت (ریال)'),
-TextFormField(
-  controller: _priceController,
-  keyboardType: TextInputType.number,
-  decoration: const InputDecoration(hintText: '0'),
-  validator: (value) {
-    if (value == null || value.isEmpty) return 'لطفاً قیمت را وارد کنید';
-    final clean = value.replaceAll(',', '');
-    if (double.tryParse(clean) == null) return 'عدد معتبر وارد کنید';
-    return null;
-  },
-  onSaved: (value) => _price = double.parse(value!.replaceAll(',', '')),
-),
+                  const InputLabel(text: 'قیمت (ریال)'),
+                  TextFormField(
+                    controller: _priceController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(hintText: '0'),
+                    validator: (value) {
+                      if (value == null || value.isEmpty)
+                        return 'لطفاً قیمت را وارد کنید';
+                      final clean = value.replaceAll(',', '');
+                      if (double.tryParse(clean) == null)
+                        return 'عدد معتبر وارد کنید';
+                      return null;
+                    },
+                    onSaved: (value) =>
+                        _price = double.parse(value!.replaceAll(',', '')),
+                  ),
                   const SizedBox(height: 24),
 
                   const InputLabel(text: 'تعداد موجودی'),
