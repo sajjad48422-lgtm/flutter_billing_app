@@ -64,6 +64,7 @@ void dispose() {
       setState(() {
         _barcode = result;
         _barcodeGenerated = false;
+     }); 
     }
   }
 
