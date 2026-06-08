@@ -169,26 +169,24 @@ class _HomePageState extends State<HomePage> {
         bottomSheet: BlocBuilder<BillingBloc, BillingState>(
           builder: (context, state) {
             return SafeArea(
-              child: PrimaryButton(
-                onPressed: state.cartItems.isEmpty
-                    ? null
-                    : () async {
-                        _scannerController.stop();
-                        await context.push('/checkout');
-                        if (_isCameraOn && mounted) {
-                          _scannerController.start();
-                        }
-                      },
-                icon: Icons.receipt_long,
-                label: 'ثبت سفارش',
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  }
-
+  bottom: true,
+  child: Padding(
+    padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+    child: PrimaryButton(
+      onPressed: state.cartItems.isEmpty
+          ? null
+          : () async {
+              _scannerController.stop();
+              await context.push('/checkout');
+              if (_isCameraOn && mounted) {
+                _scannerController.start();
+              }
+            },
+      icon: Icons.receipt_long,
+      label: 'ثبت سفارش',
+    ),
+  ),
+);
   Widget _buildScannerSection() {
     return Container(
       color: Colors.black,
