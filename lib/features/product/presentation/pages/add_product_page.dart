@@ -106,7 +106,7 @@ void dispose() {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  _name.isNotEmpty ? _name : 'کالا',
+                  _nameController.text.isNotEmpty ? _nameController.text : 'کالا',
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
