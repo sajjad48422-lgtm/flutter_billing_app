@@ -13,6 +13,7 @@ import '../bloc/product_bloc.dart';
 import '../../domain/entities/product.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/app_validators.dart';
+import 'dart:ui' as ui;
 
 class AddProductPage extends StatefulWidget {
   const AddProductPage({super.key});
