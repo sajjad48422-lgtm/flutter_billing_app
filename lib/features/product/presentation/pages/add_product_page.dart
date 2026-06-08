@@ -295,36 +295,37 @@ void dispose() {
                           ),
                           const SizedBox(height: 12),
                           Screenshot(
-                            controller: _screenshotController,
-                            child: Container(
-  color: Colors.white,
-  padding: const EdgeInsets.all(12),
-  child: Column(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      if (_nameController.text.isNotEmpty)
-        Padding(
-          padding: const EdgeInsets.only(bottom: 8),
-          child: Text(
-            _nameController.text,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
+  controller: _screenshotController,
+  child: Container(
+    color: Colors.white,
+    padding: const EdgeInsets.all(12),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (_nameController.text.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Text(
+              _nameController.text,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
             ),
           ),
+        BarcodeWidget(
+          barcode: Barcode.code128(),
+          data: _barcode,
+          width: 250,
+          height: 80,
+          style: const TextStyle(
+            fontSize: 12,
+            color: Colors.black,
+          ),
         ),
-      BarcodeWidget(
-        barcode: Barcode.code128(),
-        data: _barcode,
-        width: 250,
-        height: 80,
-        style: const TextStyle(
-          fontSize: 12,
-          color: Colors.black,
-        ),
-      ),
-    ],
+      ],
+    ),
   ),
 ),
                           const SizedBox(height: 12),
