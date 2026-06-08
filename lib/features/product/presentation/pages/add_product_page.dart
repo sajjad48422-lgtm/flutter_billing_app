@@ -100,7 +100,7 @@ class _AddProductPageState extends State<AddProductPage> {
     try {
       final image = await _screenshotController.captureFromWidget(
         Directionality(
-          textDirection: TextDirection.rtl,
+        //  textDirection: TextDirection.rtl,
           child: Container(
             color: Colors.white,
             padding: const EdgeInsets.all(24),
@@ -200,7 +200,7 @@ class _AddProductPageState extends State<AddProductPage> {
   @override
   Widget build(BuildContext context) {
     return Directionality(
-      textDirection: TextDirection.rtl,
+     // textDirection: TextDirection.rtl,
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.transparent,
