@@ -31,6 +31,9 @@ class _AddProductPageState extends State<AddProductPage> {
   int _lowStockThreshold = 2;
   ProductUnit _unit = ProductUnit.piece;
   bool _barcodeGenerated = false;
+  final _priceController = TextEditingController();
+final _priceFormatter = NumberFormat('#,###', 'en_US');
+final _nameController = TextEditingController();
   @override
 void initState() {
   super.initState();
