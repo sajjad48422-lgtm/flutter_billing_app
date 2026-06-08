@@ -35,7 +35,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
     buffer.writeln('─────────────────');
     for (final item in cartItems) {
       buffer.writeln(
-        '${item.product.name} × ${item.displayAmount}', = '
+        '${item.product.name} × ${item.displayAmount} = '
         '${CurrencyFormatter.format(item.total)}',
       );
     }
@@ -143,7 +143,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '${item.product.name} × ${item.quantity}',
+                        '${item.product.name} × ${item.displayAmount}',
                         style: const TextStyle(
                             fontSize: 14, color: Colors.black),
                       ),
