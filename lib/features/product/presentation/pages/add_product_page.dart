@@ -260,7 +260,7 @@ void dispose() {
                         child: IconButton(
                           icon: const Icon(Icons.auto_awesome,
                               color: Colors.green),
-                          onPressed: _generateBarcode,
+                          onPressed: _nameController.text.trim().isEmpty ? null : _generateBarcode,
                           padding: const EdgeInsets.all(14),
                           tooltip: 'ساخت بارکد خودکار',
                         ),
