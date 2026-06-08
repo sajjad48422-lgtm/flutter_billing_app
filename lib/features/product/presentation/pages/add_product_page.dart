@@ -335,13 +335,15 @@ void dispose() {
                   const SizedBox(height: 24),
                   const InputLabel(text: 'نام کالا'),
                   TextFormField(
-                    decoration: const InputDecoration(
-                      hintText: 'مثلاً: برنج ایرانی',
-                    ),
-                    validator:
-                        AppValidators.required('لطفاً نام کالا را وارد کنید'),
-                    onSaved: (value) => _name = value!,
-                  ),
+  controller: _nameController,
+  decoration: const InputDecoration(
+    hintText: 'مثلاً: برنج ایرانی',
+  ),
+  onChanged: (value) => setState(() {}),
+  validator:
+      AppValidators.required('لطفاً نام کالا را وارد کنید'),
+  onSaved: (value) => _name = value!,
+),
                   const SizedBox(height: 24),
 
                   const InputLabel(text: 'واحد سنجش'),
