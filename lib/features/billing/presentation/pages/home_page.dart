@@ -58,7 +58,6 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  // نمایش دیالوگ مقدار برای کالاهای وزنی
   Future<void> _showWeightDialog(
       BuildContext context, Product product) async {
     final controller = TextEditingController();
@@ -128,25 +127,25 @@ class _HomePageState extends State<HomePage> {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         body: BlocListener<BillingBloc, BillingState>(
-  listenWhen: (previous, current) =>
-      (previous.error != current.error && current.error != null) ||
-      (previous.pendingWeightProduct != current.pendingWeightProduct &&
-          current.pendingWeightProduct != null),
-  listener: (context, state) {
-    if (state.error != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(state.error!),
-          backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    }
-    if (state.pendingWeightProduct != null) {
-      _showWeightDialog(context, state.pendingWeightProduct!);
-      context.read<BillingBloc>().add(ClearPendingProductEvent());
-    }
-  },
+          listenWhen: (previous, current) =>
+              (previous.error != current.error && current.error != null) ||
+              (previous.pendingWeightProduct != current.pendingWeightProduct &&
+                  current.pendingWeightProduct != null),
+          listener: (context, state) {
+            if (state.error != null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.error!),
+                  backgroundColor: Colors.red,
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            }
+            if (state.pendingWeightProduct != null) {
+              _showWeightDialog(context, state.pendingWeightProduct!);
+              context.read<BillingBloc>().add(ClearPendingProductEvent());
+            }
+          },
           child: Stack(
             children: [
               Positioned(
@@ -169,26 +168,30 @@ class _HomePageState extends State<HomePage> {
         bottomSheet: BlocBuilder<BillingBloc, BillingState>(
           builder: (context, state) {
             return SafeArea(
-  bottom: true,
-  child: Padding(
-    padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-    child: PrimaryButton(
-      onPressed: state.cartItems.isEmpty
-          ? null
-          : () async {
-              _scannerController.stop();
-              await context.push('/checkout');
-              if (_isCameraOn && mounted) {
-                _scannerController.start();
-              }
-            },
-      icon: Icons.receipt_long,
-      label: 'ثبت سفارش',
-    ),
-  ),
-);
-  },
-   ),
+              bottom: true,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                child: PrimaryButton(
+                  onPressed: state.cartItems.isEmpty
+                      ? null
+                      : () async {
+                          _scannerController.stop();
+                          await context.push('/checkout');
+                          if (_isCameraOn && mounted) {
+                            _scannerController.start();
+                          }
+                        },
+                  icon: Icons.receipt_long,
+                  label: 'ثبت سفارش',
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
   Widget _buildScannerSection() {
     return Container(
       color: Colors.black,
@@ -487,8 +490,7 @@ class _HomePageState extends State<HomePage> {
           ),
           const SizedBox(height: 16),
           const Text('سبد خرید خالی است',
-              style:
-                  TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
           const SizedBox(height: 8),
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 40),
@@ -520,14 +522,12 @@ class _HomePageState extends State<HomePage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // کنترل‌های مقدار
           item.isWeightBased
               ? _buildWeightControl(context, item)
               : _buildQuantityControl(context, item),
 
           const SizedBox(width: 12),
 
-          // اطلاعات کالا
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -564,7 +564,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // کنترل تعداد برای کالاهای عددی
   Widget _buildQuantityControl(BuildContext context, CartItem item) {
     return Container(
       decoration: BoxDecoration(
@@ -607,7 +606,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // کنترل وزن برای کالاهای وزنی
   Widget _buildWeightControl(BuildContext context, CartItem item) {
     return Column(
       children: [
