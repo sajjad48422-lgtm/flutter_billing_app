@@ -187,6 +187,8 @@ class _HomePageState extends State<HomePage> {
     ),
   ),
 );
+  },
+   ),
   Widget _buildScannerSection() {
     return Container(
       color: Colors.black,
