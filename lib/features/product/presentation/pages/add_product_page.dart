@@ -55,6 +55,7 @@ void initState() {
 @override
 void dispose() {
   _priceController.dispose();
+  _nameController.dispose();
   super.dispose();
 }
   void _scanBarcode() async {
