@@ -229,7 +229,6 @@ void dispose() {
                         child: TextFormField(
                           key: ValueKey(_barcode),
                           initialValue: _barcode,
-                          textDirection: TextDirection.ltr,
                           decoration: const InputDecoration(
                             hintText: 'اسکن یا وارد کنید',
                           ),
@@ -397,7 +396,6 @@ const InputLabel(text: 'قیمت (ریال)'),
 TextFormField(
   controller: _priceController,
   keyboardType: TextInputType.number,
-  textDirection: TextDirection.ltr,
   decoration: const InputDecoration(hintText: '0'),
   validator: (value) {
     if (value == null || value.isEmpty) return 'لطفاً قیمت را وارد کنید';
@@ -412,7 +410,6 @@ TextFormField(
                   const InputLabel(text: 'تعداد موجودی'),
                   TextFormField(
                     keyboardType: TextInputType.number,
-                    textDirection: TextDirection.ltr,
                     decoration: const InputDecoration(hintText: '0'),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -430,7 +427,6 @@ TextFormField(
                   const InputLabel(text: 'هشدار کمبود موجودی'),
                   TextFormField(
                     keyboardType: TextInputType.number,
-                    textDirection: TextDirection.ltr,
                     initialValue: '2',
                     decoration: const InputDecoration(
                       hintText: '2',
