@@ -344,7 +344,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                         return TableRow(
                                           children: [
                                             _buildDataCell(
-                                              '${item.product.name} × ${item.quantity}',
+                                              '${item.product.name} × ${item.displayAmount}',
                                               TextAlign.right,
                                             ),
                                             _buildDataCell(
