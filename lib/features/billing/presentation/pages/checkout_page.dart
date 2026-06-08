@@ -35,7 +35,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
     buffer.writeln('─────────────────');
     for (final item in cartItems) {
       buffer.writeln(
-        '${item.product.name} x${item.quantity} = '
+        '${item.product.name} × ${item.displayAmount}', = '
         '${CurrencyFormatter.format(item.total)}',
       );
     }
