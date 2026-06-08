@@ -300,9 +300,7 @@ void dispose() {
                             child: Container(
                               color: Colors.white,
                               padding: const EdgeInsets.all(12),
-                              child: Container(
-  color: Colors.white,
-  padding: const EdgeInsets.all(12),
+                              
   child: Column(
     mainAxisSize: MainAxisSize.min,
     children: [
