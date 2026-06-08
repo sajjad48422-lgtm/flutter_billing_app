@@ -297,9 +297,8 @@ void dispose() {
                           Screenshot(
                             controller: _screenshotController,
                             child: Container(
-                              color: Colors.white,
-                              padding: const EdgeInsets.all(12),
-                              
+  color: Colors.white,
+  padding: const EdgeInsets.all(12),
   child: Column(
     mainAxisSize: MainAxisSize.min,
     children: [
