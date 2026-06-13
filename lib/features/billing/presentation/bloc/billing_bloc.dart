@@ -51,10 +51,15 @@ class BillingBloc extends Bloc<BillingEvent, BillingState> {
       AddProductToCartEvent event, Emitter<BillingState> emit) {
     final cleanState = state.copyWith(error: null);
 
-    final newItem = CartItem(
-      product: event.product,
-      weightAmount: event.weightAmount ?? 1.0,
-    );
+    final isWeightBased = event.product.unit == ProductUnit.kg ||
+    event.product.unit == ProductUnit.gram ||
+    event.product.unit == ProductUnit.liter ||
+    event.product.unit == ProductUnit.meter;
+
+final newItem = CartItem(
+  product: event.product,
+  weightAmount: isWeightBased ? (event.weightAmount ?? 1.0) : 1.0,
+);
 
     final existingIndex = cleanState.cartItems
         .indexWhere((item) => item.product.id == event.product.id);
