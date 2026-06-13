@@ -15,10 +15,10 @@ class ScanBarcodeEvent extends BillingEvent {
 
 class AddProductToCartEvent extends BillingEvent {
   final Product product;
-  final double weightAmount;
-  const AddProductToCartEvent(this.product, {this.weightAmount = 1.0});
+  final double? weightAmount;
+const AddProductToCartEvent(this.product, {this.weightAmount});
   @override
-  List<Object> get props => [product, weightAmount];
+  List<Object> get props => [product, weightAmount ?? 0.0];
 }
 
 class RemoveProductFromCartEvent extends BillingEvent {
