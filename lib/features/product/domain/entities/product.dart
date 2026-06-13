@@ -71,7 +71,11 @@ class Product extends Equatable {
 
   bool get isLowStock => stock <= lowStockThreshold && stock > 0;
   bool get isOutOfStock => stock <= 0;
-  bool get isWeightBased => unit == ProductUnit.kg || unit == ProductUnit.gram;
+  bool get isWeightBased =>
+    unit == ProductUnit.kg ||
+    unit == ProductUnit.gram ||
+    unit == ProductUnit.liter ||
+    unit == ProductUnit.meter;
   @override
   List<Object?> get props =>
       [id, name, barcode, price, stock, lowStockThreshold, unit];
