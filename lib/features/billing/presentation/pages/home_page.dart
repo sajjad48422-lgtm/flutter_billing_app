@@ -58,8 +58,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> _showWeightDialog(
-      BuildContext context, Product product) async {
+  Future<void> _showWeightDialog(BuildContext context, Product product) async {
     final controller = TextEditingController();
     final result = await showDialog<double>(
       context: context,
@@ -77,8 +76,8 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 12),
             TextField(
               controller: controller,
-              keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              textDirection: TextDirection.ltr,
               autofocus: true,
               decoration: InputDecoration(
                 hintText: 'مثلاً: 10.5',
@@ -196,7 +195,6 @@ class _HomePageState extends State<HomePage> {
             onDetect: _onDetect,
           ),
           if (!_isCameraOn) _buildCameraOffState(),
-
           Positioned(
             top: MediaQuery.of(context).padding.top + 16,
             left: 16,
@@ -213,9 +211,7 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(height: 16),
                 if (_isCameraOn)
                   _buildOverlayButton(
-                    icon: _isFlashOn
-                        ? Icons.flashlight_off
-                        : Icons.flashlight_on,
+                    icon: _isFlashOn ? Icons.flashlight_off : Icons.flashlight_on,
                     onPressed: () {
                       setState(() => _isFlashOn = !_isFlashOn);
                       _scannerController.toggleTorch();
@@ -236,7 +232,6 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
-
           if (_isCameraOn)
             Center(
               child: Container(
@@ -275,17 +270,11 @@ class _HomePageState extends State<HomePage> {
               shape: BoxShape.circle,
             ),
             alignment: Alignment.center,
-            child: const Icon(Icons.videocam_off,
-                color: Colors.white, size: 32),
+            child: const Icon(Icons.videocam_off, color: Colors.white, size: 32),
           ),
           const SizedBox(height: 16),
-          const Text(
-            'دوربین خاموش است',
-            style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 16),
-          ),
+          const Text('دوربین خاموش است',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
           const SizedBox(height: 8),
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 32),
@@ -300,10 +289,8 @@ class _HomePageState extends State<HomePage> {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primaryColor,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20)),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             ),
             icon: const Icon(Icons.videocam),
             label: const Text('روشن کردن دوربین',
@@ -347,20 +334,16 @@ class _HomePageState extends State<HomePage> {
         height: 32,
         decoration: BoxDecoration(
           border: Border(
-            top: (alignment == Alignment.topLeft ||
-                    alignment == Alignment.topRight)
+            top: (alignment == Alignment.topLeft || alignment == Alignment.topRight)
                 ? const BorderSide(color: Colors.greenAccent, width: 4)
                 : BorderSide.none,
-            bottom: (alignment == Alignment.bottomLeft ||
-                    alignment == Alignment.bottomRight)
+            bottom: (alignment == Alignment.bottomLeft || alignment == Alignment.bottomRight)
                 ? const BorderSide(color: Colors.greenAccent, width: 4)
                 : BorderSide.none,
-            left: (alignment == Alignment.topLeft ||
-                    alignment == Alignment.bottomLeft)
+            left: (alignment == Alignment.topLeft || alignment == Alignment.bottomLeft)
                 ? const BorderSide(color: Colors.greenAccent, width: 4)
                 : BorderSide.none,
-            right: (alignment == Alignment.topRight ||
-                    alignment == Alignment.bottomRight)
+            right: (alignment == Alignment.topRight || alignment == Alignment.bottomRight)
                 ? const BorderSide(color: Colors.greenAccent, width: 4)
                 : BorderSide.none,
           ),
@@ -375,10 +358,7 @@ class _HomePageState extends State<HomePage> {
         color: Theme.of(context).scaffoldBackgroundColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         boxShadow: const [
-          BoxShadow(
-              color: Colors.black26,
-              blurRadius: 15,
-              offset: Offset(0, -5))
+          BoxShadow(color: Colors.black26, blurRadius: 15, offset: Offset(0, -5))
         ],
       ),
       child: Column(
@@ -392,14 +372,12 @@ class _HomePageState extends State<HomePage> {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-
           BlocBuilder<BillingBloc, BillingState>(
             builder: (context, state) {
-              final totalItems = state.cartItems
-                  .fold<int>(0, (sum, i) => sum + i.quantity);
+              final totalItems =
+                  state.cartItems.fold<int>(0, (sum, i) => sum + i.quantity);
               return Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 24, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -407,12 +385,9 @@ class _HomePageState extends State<HomePage> {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         const Text('اقلام اسکن شده',
-                            style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600)),
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
                         Text('$totalItems کالا',
-                            style: const TextStyle(
-                                fontSize: 12, color: Colors.grey)),
+                            style: const TextStyle(fontSize: 12, color: Colors.grey)),
                       ],
                     ),
                     Column(
@@ -439,19 +414,14 @@ class _HomePageState extends State<HomePage> {
             },
           ),
           const Divider(height: 1),
-
           Expanded(
             child: BlocBuilder<BillingBloc, BillingState>(
               builder: (context, state) {
-                if (state.cartItems.isEmpty) {
-                  return _buildEmptyCart();
-                }
+                if (state.cartItems.isEmpty) return _buildEmptyCart();
                 return ListView.separated(
-                  padding: const EdgeInsets.only(
-                      left: 15, right: 15, top: 16, bottom: 100),
+                  padding: const EdgeInsets.only(left: 15, right: 15, top: 16, bottom: 100),
                   itemCount: state.cartItems.length,
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(height: 12),
+                  separatorBuilder: (context, index) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final item = state.cartItems[index];
                     return _buildCartItemCard(context, item);
@@ -473,13 +443,9 @@ class _HomePageState extends State<HomePage> {
           Container(
             width: 80,
             height: 80,
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              shape: BoxShape.circle,
-            ),
+            decoration: BoxDecoration(color: Colors.grey[100], shape: BoxShape.circle),
             alignment: Alignment.center,
-            child: Icon(Icons.shopping_basket,
-                size: 40, color: Colors.grey[300]),
+            child: Icon(Icons.shopping_basket, size: 40, color: Colors.grey[300]),
           ),
           const SizedBox(height: 16),
           const Text('سبد خرید خالی است',
@@ -505,10 +471,7 @@ class _HomePageState extends State<HomePage> {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.grey[200]!),
         boxShadow: const [
-          BoxShadow(
-              color: Colors.black12,
-              blurRadius: 4,
-              offset: Offset(0, 2))
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))
         ],
       ),
       padding: const EdgeInsets.all(16),
@@ -518,17 +481,14 @@ class _HomePageState extends State<HomePage> {
           item.isWeightBased
               ? _buildWeightControl(context, item)
               : _buildQuantityControl(context, item),
-
           const SizedBox(width: 12),
-
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
                   item.product.name,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.w600, fontSize: 14),
+                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.right,
@@ -536,10 +496,7 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(height: 4),
                 Text(
                   '${CurrencyFormatter.format(item.product.price)} / ${item.product.unit.label}',
-                  style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 12,
-                      color: Colors.grey[600]),
+                  style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12, color: Colors.grey[600]),
                 ),
                 const SizedBox(height: 2),
                 Text(
@@ -559,10 +516,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildQuantityControl(BuildContext context, CartItem item) {
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(8),
-      ),
+      decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(8)),
       padding: const EdgeInsets.all(4),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -571,8 +525,8 @@ class _HomePageState extends State<HomePage> {
             icon: Icons.remove,
             onPressed: () {
               if (item.quantity > 1) {
-                context.read<BillingBloc>().add(UpdateQuantityEvent(
-                    item.product.id, item.quantity - 1));
+                context.read<BillingBloc>().add(
+                    UpdateQuantityEvent(item.product.id, item.quantity - 1));
               } else {
                 context.read<BillingBloc>().add(
                     RemoveProductFromCartEvent(item.product.id));
@@ -590,8 +544,8 @@ class _HomePageState extends State<HomePage> {
           _circularIconButton(
             icon: Icons.add,
             onPressed: () {
-              context.read<BillingBloc>().add(UpdateQuantityEvent(
-                  item.product.id, item.quantity + 1));
+              context.read<BillingBloc>().add(
+                  UpdateQuantityEvent(item.product.id, item.quantity + 1));
             },
           ),
         ],
@@ -603,15 +557,11 @@ class _HomePageState extends State<HomePage> {
     return Column(
       children: [
         Container(
-          decoration: BoxDecoration(
-            color: Colors.grey[100],
-            borderRadius: BorderRadius.circular(8),
-          ),
+          decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(8)),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: Text(
             item.displayAmount,
-            style: const TextStyle(
-                fontWeight: FontWeight.bold, fontSize: 13),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
           ),
         ),
         const SizedBox(height: 4),
@@ -636,10 +586,8 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Future<void> _showWeightEditDialog(
-      BuildContext context, CartItem item) async {
-    final controller = TextEditingController(
-        text: item.weightAmount.toString());
+  Future<void> _showWeightEditDialog(BuildContext context, CartItem item) async {
+    final controller = TextEditingController(text: item.weightAmount.toString());
     final result = await showDialog<double>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -654,12 +602,10 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 12),
             TextField(
               controller: controller,
-              keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              textDirection: TextDirection.ltr,
               autofocus: true,
-              decoration: InputDecoration(
-                suffixText: item.product.unit.label,
-              ),
+              decoration: InputDecoration(suffixText: item.product.unit.label),
             ),
           ],
         ),
@@ -682,9 +628,7 @@ class _HomePageState extends State<HomePage> {
     );
 
     if (result != null && mounted) {
-      context.read<BillingBloc>().add(
-            UpdateWeightEvent(item.product.id, result),
-          );
+      context.read<BillingBloc>().add(UpdateWeightEvent(item.product.id, result));
     }
   }
 
