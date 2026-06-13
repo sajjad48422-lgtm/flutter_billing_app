@@ -121,9 +121,8 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: BlocListener<BillingBloc, BillingState>(
         listenWhen: (previous, current) =>
-            (previous.error != current.error && current.error != null) ||
-            (previous.pendingWeightProduct != current.pendingWeightProduct &&
-                current.pendingWeightProduct != null),
+    (previous.error != current.error && current.error != null) ||
+    current.pendingWeightProduct != null,
         listener: (context, state) {
           if (state.error != null) {
             ScaffoldMessenger.of(context).showSnackBar(
