@@ -1,7 +1,7 @@
 import 'package:hive/hive.dart';
 import '../../domain/entities/product.dart';
 
-part 'product_model.g.dart'; // Hive generator
+part 'product_model.g.dart';
 
 @HiveType(typeId: 0)
 class ProductModel extends Product {
@@ -20,6 +20,11 @@ class ProductModel extends Product {
   @override
   @HiveField(4)
   final int stock;
+  @override
+  @HiveField(5)
+  final int lowStockThreshold;
+  @HiveField(6)
+  final int unitIndex;
 
   const ProductModel({
     required this.id,
@@ -27,12 +32,16 @@ class ProductModel extends Product {
     required this.barcode,
     required this.price,
     required this.stock,
+    this.lowStockThreshold = 2,
+    this.unitIndex = 0,
   }) : super(
           id: id,
           name: name,
           barcode: barcode,
           price: price,
           stock: stock,
+          lowStockThreshold: lowStockThreshold,
+          unit: ProductUnit.values[unitIndex],
         );
 
   factory ProductModel.fromEntity(Product product) {
@@ -42,6 +51,8 @@ class ProductModel extends Product {
       barcode: product.barcode,
       price: product.price,
       stock: product.stock,
+      lowStockThreshold: product.lowStockThreshold,
+      unitIndex: product.unit.index,
     );
   }
 
@@ -52,6 +63,8 @@ class ProductModel extends Product {
       barcode: barcode,
       price: price,
       stock: stock,
+      lowStockThreshold: lowStockThreshold,
+      unit: ProductUnit.values[unitIndex],
     );
   }
 }
