@@ -2,10 +2,6 @@
 
 part of 'product_model.dart';
 
-// **************************************************************************
-// TypeAdapterGenerator
-// **************************************************************************
-
 class ProductModelAdapter extends TypeAdapter<ProductModel> {
   @override
   final int typeId = 0;
@@ -22,13 +18,15 @@ class ProductModelAdapter extends TypeAdapter<ProductModel> {
       barcode: fields[2] as String,
       price: fields[3] as double,
       stock: fields[4] as int,
+      lowStockThreshold: fields[5] == null ? 2 : fields[5] as int,
+      unitIndex: fields[6] == null ? 0 : fields[6] as int,
     );
   }
 
   @override
   void write(BinaryWriter writer, ProductModel obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -38,7 +36,11 @@ class ProductModelAdapter extends TypeAdapter<ProductModel> {
       ..writeByte(3)
       ..write(obj.price)
       ..writeByte(4)
-      ..write(obj.stock);
+      ..write(obj.stock)
+      ..writeByte(5)
+      ..write(obj.lowStockThreshold)
+      ..writeByte(6)
+      ..write(obj.unitIndex);
   }
 
   @override
