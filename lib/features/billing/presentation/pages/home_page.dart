@@ -24,7 +24,7 @@ class _HomePageState extends State<HomePage> {
     returnImage: false,
   );
 
-  bool _isCameraOn = true;
+  bool _isCameraOn = false;
   bool _isFlashOn = false;
   final Map<String, DateTime> _lastScanTimes = {};
 
