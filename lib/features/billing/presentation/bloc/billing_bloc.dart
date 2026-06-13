@@ -22,41 +22,44 @@ class BillingBloc extends Bloc<BillingEvent, BillingState> {
     on<UpdateWeightEvent>(_onUpdateWeight);
     on<ClearCartEvent>(_onClearCart);
     on<PrintReceiptEvent>(_onPrintReceipt);
-    on<SendSmsReceiptEvent>(_onSendSmsReceipt);   on<ClearPendingProductEvent>(_onClearPendingProduct);
+    on<SendSmsReceiptEvent>(_onSendSmsReceipt);
+    on<ClearPendingProductEvent>(_onClearPendingProduct);
   }
 
   Future<void> _onScanBarcode(
-    ScanBarcodeEvent event, Emitter<BillingState> emit) async {
-  final result = await getProductByBarcodeUseCase(event.barcode);
-  result.fold(
-    (failure) => emit(state.copyWith(
-        error: 'محصول یافت نشد: ${event.barcode}')),
-    (product) {
-      if (product.isWeightBased) {
-        // برای کالاهای وزنی، state رو آپدیت کن تا UI دیالوگ نشون بده
-        emit(state.copyWith(pendingWeightProduct: product));
-      } else {
-        add(AddProductToCartEvent(product));
-      }
-    },
-  );
-}
+      ScanBarcodeEvent event, Emitter<BillingState> emit) async {
+    final result = await getProductByBarcodeUseCase(event.barcode);
+    result.fold(
+      (failure) => emit(state.copyWith(
+          error: 'محصول یافت نشد: ${event.barcode}')),
+      (product) {
+        final isWeightBased = product.unit == ProductUnit.kg ||
+            product.unit == ProductUnit.gram ||
+            product.unit == ProductUnit.liter ||
+            product.unit == ProductUnit.meter;
+
+        if (isWeightBased) {
+          emit(state.copyWith(pendingWeightProduct: product));
+        } else {
+          add(AddProductToCartEvent(product));
+        }
+      },
+    );
+  }
 
   void _onAddProductToCart(
       AddProductToCartEvent event, Emitter<BillingState> emit) {
     final cleanState = state.copyWith(error: null);
 
-    // برای کالاهای وزنی، همیشه یه آیتم جدید اضافه می‌کنیم
     final newItem = CartItem(
       product: event.product,
-      weightAmount: event.weightAmount,
+      weightAmount: event.weightAmount ?? 1.0,
     );
 
     final existingIndex = cleanState.cartItems
         .indexWhere((item) => item.product.id == event.product.id);
 
     if (existingIndex >= 0 && !newItem.isWeightBased) {
-      // فقط برای کالاهای تعدادی، تعداد رو زیاد کن
       final existingItem = cleanState.cartItems[existingIndex];
       final updatedItems = List<CartItem>.from(cleanState.cartItems);
       updatedItems[existingIndex] =
@@ -119,21 +122,18 @@ class BillingBloc extends Bloc<BillingEvent, BillingState> {
       if (savedMac != null) {
         final connected = await printerHelper.connect(savedMac);
         if (!connected) {
-          emit(state.copyWith(
-              error: 'اتصال به پرینتر ناموفق بود!', clearError: false));
+          emit(state.copyWith(error: 'اتصال به پرینتر ناموفق بود!', clearError: false));
           emit(state.copyWith(clearError: true));
           return;
         }
       } else {
-        emit(state.copyWith(
-            error: 'پرینتر متصل نیست!', clearError: false));
+        emit(state.copyWith(error: 'پرینتر متصل نیست!', clearError: false));
         emit(state.copyWith(clearError: true));
         return;
       }
     }
 
-    emit(state.copyWith(
-        isPrinting: true, printSuccess: false, clearError: true));
+    emit(state.copyWith(isPrinting: true, printSuccess: false, clearError: true));
 
     try {
       final items = state.cartItems
@@ -156,10 +156,7 @@ class BillingBloc extends Bloc<BillingEvent, BillingState> {
 
       emit(state.copyWith(isPrinting: false, printSuccess: true));
     } catch (e) {
-      emit(state.copyWith(
-          isPrinting: false,
-          error: 'خطا در چاپ: $e',
-          clearError: false));
+      emit(state.copyWith(isPrinting: false, error: 'خطا در چاپ: $e', clearError: false));
       emit(state.copyWith(clearError: true));
     }
   }
@@ -191,22 +188,17 @@ class BillingBloc extends Bloc<BillingEvent, BillingState> {
         emit(state.copyWith(isSendingSms: false, smsSuccess: true));
         break;
       case SmsResult.permissionDenied:
-        emit(state.copyWith(
-            isSendingSms: false,
-            error: 'دسترسی به پیامک داده نشد!',
-            clearError: false));
+        emit(state.copyWith(isSendingSms: false, error: 'دسترسی به پیامک داده نشد!', clearError: false));
         emit(state.copyWith(clearError: true));
         break;
       case SmsResult.failed:
-        emit(state.copyWith(
-            isSendingSms: false,
-            error: 'ارسال پیامک ناموفق بود!',
-            clearError: false));
+        emit(state.copyWith(isSendingSms: false, error: 'ارسال پیامک ناموفق بود!', clearError: false));
         emit(state.copyWith(clearError: true));
         break;
     }
   }
-void _onClearPendingProduct(
+
+  void _onClearPendingProduct(
       ClearPendingProductEvent event, Emitter<BillingState> emit) {
     emit(state.copyWith(clearPendingProduct: true));
   }
