@@ -28,7 +28,7 @@ class MorePage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         children: [
-          _buildSection('تنظیمات', [
+          _buildSection(context, 'تنظیمات', [
             _MoreItem(
               icon: Icons.store_outlined,
               label: 'اطلاعات فروشگاه',
@@ -46,7 +46,7 @@ class MorePage extends StatelessWidget {
             ),
           ]),
           const SizedBox(height: 12),
-          _buildSection('داده‌ها', [
+          _buildSection(context, 'داده‌ها', [
             _MoreItem(
               icon: Icons.backup_outlined,
               label: 'پشتیبان‌گیری',
@@ -61,7 +61,7 @@ class MorePage extends StatelessWidget {
             ),
           ]),
           const SizedBox(height: 12),
-          _buildSection('اطلاعات', [
+          _buildSection(context, 'اطلاعات', [
             _MoreItem(
               icon: Icons.info_outline,
               label: 'درباره برنامه',
@@ -74,7 +74,8 @@ class MorePage extends StatelessWidget {
     );
   }
 
-  Widget _buildSection(String title, List<_MoreItem> items) {
+  Widget _buildSection(
+      BuildContext context, String title, List<_MoreItem> items) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -147,7 +148,6 @@ class MorePage extends StatelessWidget {
     try {
       final Map<String, dynamic> backupData = {};
 
-      // Export all Hive boxes
       final boxNames = ['products', 'shop', 'sales_box'];
       for (final boxName in boxNames) {
         try {
@@ -203,8 +203,8 @@ class MorePage extends StatelessWidget {
             child: const Text('انصراف'),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red),
+            style:
+                ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () => Navigator.pop(ctx, true),
             child: const Text('بازگردانی',
                 style: TextStyle(color: Colors.white)),
