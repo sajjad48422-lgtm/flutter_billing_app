@@ -18,7 +18,7 @@ class SaleRepositoryImpl implements SaleRepository {
       await _box.put(record.id, model);
       return const Right(null);
     } catch (e) {
-      return Left(CacheFailure('خطا در ذخیره فروش: $e'));
+      return Left<Failure, void>(CacheFailure('خطا در ذخیره فروش: $e'));
     }
   }
 
@@ -27,9 +27,10 @@ class SaleRepositoryImpl implements SaleRepository {
     try {
       final records = _box.values.map((m) => m.toEntity()).toList();
       records.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-      return Right(records);
+      return Right<Failure, List<SaleRecord>>(records);
     } catch (e) {
-      return Left(CacheFailure('خطا در دریافت فروش‌ها: $e'));
+      return Left<Failure, List<SaleRecord>>(
+          CacheFailure('خطا در دریافت فروش‌ها: $e'));
     }
   }
 
@@ -44,9 +45,10 @@ class SaleRepositoryImpl implements SaleRepository {
               r.createdAt.isBefore(to.add(const Duration(days: 1))))
           .toList();
       records.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-      return Right(records);
+      return Right<Failure, List<SaleRecord>>(records);
     } catch (e) {
-      return Left(CacheFailure('خطا در دریافت فروش‌ها: $e'));
+      return Left<Failure, List<SaleRecord>>(
+          CacheFailure('خطا در دریافت فروش‌ها: $e'));
     }
   }
 }
