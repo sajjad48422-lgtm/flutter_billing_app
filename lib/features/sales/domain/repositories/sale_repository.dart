@@ -1,6 +1,6 @@
+import 'package:depir/core/error/failures.dart';
 import 'package:fpdart/fpdart.dart';
-import '../../../../core/error/failures.dart';
-import '../entities/sale_record.dart';
+import 'package:depir/features/sales/domain/entities/sale_record.dart';
 
 abstract class SaleRepository {
   Future<Either<Failure, void>> saveSale(SaleRecord record);
