@@ -7,9 +7,9 @@ import '../models/sale_record_hive_model.dart';
 
 class SaleRepositoryImpl implements SaleRepository {
   static const String _salesBox = 'sales_box';
-  static const String _saleItemsBox = 'sale_items_box';
 
-  Box<SaleRecordHiveModel> get _box => Hive.box<SaleRecordHiveModel>(_salesBox);
+  Box<SaleRecordHiveModel> get _box =>
+      Hive.box<SaleRecordHiveModel>(_salesBox);
 
   @override
   Future<Either<Failure, void>> saveSale(SaleRecord record) async {
@@ -18,7 +18,7 @@ class SaleRepositoryImpl implements SaleRepository {
       await _box.put(record.id, model);
       return const Right(null);
     } catch (e) {
-      return Left(DatabaseFailure('خطا در ذخیره فروش: $e'));
+      return Left(CacheFailure('خطا در ذخیره فروش: $e'));
     }
   }
 
@@ -29,7 +29,7 @@ class SaleRepositoryImpl implements SaleRepository {
       records.sort((a, b) => b.createdAt.compareTo(a.createdAt));
       return Right(records);
     } catch (e) {
-      return Left(DatabaseFailure('خطا در دریافت فروش‌ها: $e'));
+      return Left(CacheFailure('خطا در دریافت فروش‌ها: $e'));
     }
   }
 
@@ -46,10 +46,7 @@ class SaleRepositoryImpl implements SaleRepository {
       records.sort((a, b) => b.createdAt.compareTo(a.createdAt));
       return Right(records);
     } catch (e) {
-      return Left(DatabaseFailure('خطا در دریافت فروش‌ها: $e'));
+      return Left(CacheFailure('خطا در دریافت فروش‌ها: $e'));
     }
   }
-
-  static String get salesBoxName => _salesBox;
-  static String get saleItemsBoxName => _saleItemsBox;
 }
