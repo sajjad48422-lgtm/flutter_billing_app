@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
-import '../../presentation/bloc/reports_bloc.dart';
+import '../../../sales/presentation/bloc/reports_bloc.dart';
 import '../../../../core/utils/currency_formatter.dart';
 
 class ReportsPage extends StatelessWidget {
@@ -48,7 +47,8 @@ class ReportsPage extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))
+          BoxShadow(
+              color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))
         ],
       ),
       child: Row(
@@ -66,14 +66,14 @@ class ReportsPage extends StatelessWidget {
     final isSelected = state.period == period;
     return Expanded(
       child: GestureDetector(
-        onTap: () => context
-            .read<ReportsBloc>()
-            .add(ChangeReportPeriodEvent(period)),
+        onTap: () =>
+            context.read<ReportsBloc>().add(ChangeReportPeriodEvent(period)),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFF6C63FF) : Colors.transparent,
+            color:
+                isSelected ? const Color(0xFF6C63FF) : Colors.transparent,
             borderRadius: BorderRadius.circular(10),
           ),
           alignment: Alignment.center,
@@ -96,15 +96,15 @@ class ReportsPage extends StatelessWidget {
       children: [
         _buildSummaryCards(state),
         const SizedBox(height: 16),
-        _buildRevenueChart(context, state),
+        _buildRevenueChart(state),
         const SizedBox(height: 16),
         _buildProfitCard(state),
         const SizedBox(height: 16),
         if (state.topProducts.isNotEmpty) ...[
-          _buildTopProducts(context, state),
+          _buildTopProducts(state),
           const SizedBox(height: 16),
         ],
-        _buildInventoryHint(context),
+        _buildInventoryHint(),
         const SizedBox(height: 80),
       ],
     );
@@ -144,7 +144,9 @@ class ReportsPage extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: const [
             BoxShadow(
-                color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))
+                color: Colors.black12,
+                blurRadius: 4,
+                offset: Offset(0, 2))
           ],
         ),
         child: Column(
@@ -178,7 +180,7 @@ class ReportsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildRevenueChart(BuildContext context, ReportsState state) {
+  Widget _buildRevenueChart(ReportsState state) {
     if (state.dailyRevenue.isEmpty) return const SizedBox.shrink();
 
     final entries = state.dailyRevenue.entries.toList();
@@ -191,7 +193,8 @@ class ReportsPage extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))
+          BoxShadow(
+              color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))
         ],
       ),
       child: Column(
@@ -249,16 +252,16 @@ class ReportsPage extends StatelessWidget {
   }
 
   Widget _buildProfitCard(ReportsState state) {
-    final profitColor = state.totalProfit >= 0
-        ? const Color(0xFF00C48C)
-        : Colors.red;
+    final profitColor =
+        state.totalProfit >= 0 ? const Color(0xFF00C48C) : Colors.red;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))
+          BoxShadow(
+              color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))
         ],
       ),
       child: Column(
@@ -271,7 +274,8 @@ class ReportsPage extends StatelessWidget {
           const SizedBox(height: 16),
           _profitRow('درآمد', state.totalRevenue, const Color(0xFF00C48C)),
           const SizedBox(height: 8),
-          _profitRow('بهای تمام شده', state.totalCost, Colors.orange),
+          _profitRow(
+              'بهای تمام شده', state.totalCost, Colors.orange),
           const Divider(height: 24),
           _profitRow('سود خالص', state.totalProfit, profitColor,
               isBold: true),
@@ -305,14 +309,15 @@ class ReportsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTopProducts(BuildContext context, ReportsState state) {
+  Widget _buildTopProducts(ReportsState state) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))
+          BoxShadow(
+              color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))
         ],
       ),
       child: Column(
@@ -380,7 +385,7 @@ class ReportsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildInventoryHint(BuildContext context) {
+  Widget _buildInventoryHint() {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -389,15 +394,16 @@ class ReportsPage extends StatelessWidget {
         border: Border.all(
             color: const Color(0xFF6C63FF).withValues(alpha: 0.2)),
       ),
-      child: Row(
+      child: const Row(
         children: [
-          const Icon(Icons.inventory_2_outlined,
+          Icon(Icons.inventory_2_outlined,
               color: Color(0xFF6C63FF), size: 20),
-          const SizedBox(width: 10),
-          const Expanded(
+          SizedBox(width: 10),
+          Expanded(
             child: Text(
               'برای مشاهده موجودی کالاها، به بخش کالاها بروید',
-              style: TextStyle(fontSize: 12, color: Color(0xFF6C63FF)),
+              style:
+                  TextStyle(fontSize: 12, color: Color(0xFF6C63FF)),
             ),
           ),
         ],
