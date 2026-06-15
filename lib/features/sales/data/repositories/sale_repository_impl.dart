@@ -1,9 +1,9 @@
+import 'package:depir/core/error/failures.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:hive/hive.dart';
-import '../../../../core/error/failures.dart';
-import '../../domain/entities/sale_record.dart';
-import '../../domain/repositories/sale_repository.dart';
-import '../models/sale_record_hive_model.dart';
+import 'package:depir/features/sales/domain/entities/sale_record.dart';
+import 'package:depir/features/sales/domain/repositories/sale_repository.dart';
+import 'package:depir/features/sales/data/models/sale_record_hive_model.dart';
 
 class SaleRepositoryImpl implements SaleRepository {
   static const String _salesBox = 'sales_box';
