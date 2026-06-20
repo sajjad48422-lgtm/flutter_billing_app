@@ -25,6 +25,14 @@ class ShamsiHelper {
   }
 
   static String get today => toShamsi(DateTime.now());
+
+  /// تاریخ شروع سال شمسی جاری (۱ فروردین) به‌صورت DateTime میلادی.
+  /// برای فیلتر کردن «فاکتورهای امسال» استفاده می‌شود.
+  static DateTime startOfShamsiYear([DateTime? reference]) {
+    final jalali = Jalali.fromDateTime(reference ?? DateTime.now());
+    final firstOfYear = Jalali(jalali.year, 1, 1);
+    return firstOfYear.toDateTime();
+  }
 }
 
 extension PersianString on String {
