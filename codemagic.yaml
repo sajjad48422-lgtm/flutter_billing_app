@@ -11,7 +11,7 @@ workflows:
     scripts:
       - name: Get Flutter packages
         script: |
-          flutter packages pull
+          flutter pub get
       - name: Build Debug APK
         script: |
           flutter build apk --debug
