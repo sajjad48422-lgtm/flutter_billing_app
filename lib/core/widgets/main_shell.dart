@@ -206,15 +206,20 @@ class _SlidingPillNavBar extends StatelessWidget {
     );
   }
 
-  /// تبدیل ایندکس تب به Alignment افقی بین -1.0 تا 1.0. چون Row فرزندانش
-  /// را بر اساس Directionality محیط (در این پروژه RTL سراسری) می‌چیند،
-  /// و Stack/Alignment هم به‌صورت پیش‌فرض از همان Directionality متاثر
-  /// می‌شود، این فرمول با ترتیب فیزیکی واقعی آیتم‌های Row هماهنگ می‌ماند
-  /// و نیازی به معکوس‌کردن دستی ایندکس برای RTL نیست.
+  /// تبدیل ایندکس تب به Alignment افقی بین -1.0 تا 1.0.
+  ///
+  /// نکته‌ی مهم: Alignment همیشه بر اساس محور فیزیکی مطلق صفحه است
+  /// (x=-1 یعنی چپِ فیزیکی صفحه، x=+1 یعنی راستِ فیزیکی صفحه) و خودش
+  /// با Directionality جابه‌جا نمی‌شود. اما چون کل اپ RTL است، Row این
+  /// نوار فرزندانش (یعنی آیتم‌های تب) را از راست به چپ می‌چیند — یعنی
+  /// index=0 («فروش») در راست‌ترین موقعیت فیزیکی رندر می‌شود، نه چپ‌ترین.
+  /// پس باید همان index را در محاسبه‌ی Alignment معکوس کنیم تا بیضی با
+  /// موقعیت واقعی رندرشده‌ی هر آیتم (نه با شماره‌ی index خامش) منطبق شود.
   Alignment _alignmentForIndex(int index, int count) {
     if (count <= 1) return Alignment.center;
+    final int reversedIndex = (count - 1) - index;
     final double step = 2.0 / (count - 1);
-    final double x = -1.0 + (index * step);
+    final double x = -1.0 + (reversedIndex * step);
     return Alignment(x, 0);
   }
 }
